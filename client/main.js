@@ -140,8 +140,12 @@
     });
 
     editButton.addEventListener("click", function () {
-      $('#myModal').modal(options)
+     // const modalClients = ModalWindows(clientObj);
+
+      $('#myModal').modal('show');
     });
+
+
 
     fullName.textContent = GetFullName(clientObj);
     updatedAt.textContent = GetDate(clientObj.updatedAt);
@@ -183,10 +187,101 @@
     return contacts;
   }
 
-  function GetPeridOfStudy(years) {
-    let yearOfEnding = parseInt(years) + 4;
-    let period = years + "-" + yearOfEnding.toString();
-    return period;
+  function ModalWindows(client) {
+    const parent = document.querySelector('body');
+    const modalClient = document.createElement('div');
+    modalClient.setAttribute('id', 'my');
+    modalClient.setAttribute('id', 'my');
+    modalClient.classList.add("modal", "fade");
+    const dialog = document.createElement('div');
+    dialog.classList.add("modal-dialog");
+    const modalContent = document.createElement('div');
+    modalContent.classList.add("modal-content");
+    const modalHeader = document.createElement('div');
+    modalHeader.classList.add("modal-header");
+    const modalTitle = document.createElement('h5');
+    modalTitle.classList.add("modal-title");
+    const clientId = document.createElement("div");
+    const btnClose = document.createElement('button');
+    btnClose.setAttribute('type', 'button');
+    btnClose.setAttribute('data-dismiss', 'modal');
+    btnClose.setAttribute('aria-label', 'Close');
+    btnClose.classList.add("close");
+    const iconBtn = document.createElement('span');
+    iconBtn.setAttribute('aria-hidden', 'true');
+    iconBtn.innerHTML = '&#215'
+    btnClose.append(iconBtn);
+    const modalBody = document.createElement('div');
+    modalContent.classList.add("modal-body");
+    const modalform = document.createElement('form');
+    modalContent.classList.add("modal__form");
+
+    if (client) {
+      modalTitle.textContent = "Изменить данные";
+      clientId.textContent = 'id: ' + client.id;
+    }
+    else {
+      modalTitle.textContent = "Новый клиент";
+    }
+    modalHeader.append(modalTitle);
+    modalHeader.append(clientId);
+    modalHeader.append(btnClose);
+    modalContent.append(modalHeader);
+    modalform.append(GetInput('surname', client.surname));
+    modalform.append(GetInput('name', client.name));
+    modalform.append(GetInput('lastName', client.lastName));
+    modalBody.append(modalform);
+    modalContent.append(modalBody);
+    const modalFooter = document.createElement('div');
+    modalFooter.classList.add("modal-footer");
+    const btnAddContact=GetButton('Добавить контакт');
+    modalFooter.append(btnAddContact);
+    modalContent.append(modalFooter);
+    dialog.append(modalContent);
+    modalClient.append(dialog);
+    parent.after(modalClient);
+
+  }
+
+  function GetInput(prop, value) {
+    const formGroup = document.createElement('div');
+    formGroup.classList.add("form-group");
+    const formLabel = document.createElement('label');
+    formLabel.classList.add("col-form-label");
+    const formInput = document.createElement('input');
+    formInput.setAttribute('id', prop);
+    formInput.setAttribute('type', 'text');
+    formLabel.setAttribute('for', prop);
+    formInput.classList.add("form-control");
+    switch (prop) {
+      case 'surname':
+        formLabel.textContent = 'Фамилия*'
+        break;
+      case 'name':
+        formLabel.textContent = 'Имя*'
+        break;
+      case 'lastname':
+        formLabel.textContent = 'Отчество*'
+        break;
+
+      default:
+        break;
+    }
+    formInput.value = value;
+
+    formGroup.append(formLabel);
+    formGroup.append(formInput);
+
+    return formGroup;
+
+  }
+
+  function GetButton(params) {
+    const btn =document.createElement('button' );
+    btn.classList.add('btn','btn-secondary');
+    btn.setAttribute('type', 'button');
+    btn.textContent = params;
+    return btn;
   }
 
   function GetFullName(clientObj) {
