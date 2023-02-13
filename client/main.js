@@ -119,6 +119,7 @@
     const deleteButton = document.createElement("button");
     buttonGroup.classList.add("btn-group", "btn-group");
     editButton.classList.add("btn", "btn-success");
+    editButton.setAttribute("type", "button");
     editButton.textContent = "Редактировать";
     deleteButton.classList.add("btn", "btn-danger");
     deleteButton.textContent = "Удалить";
@@ -138,12 +139,8 @@
       }
     });
 
-    editButton.addEventListener("click", async function () {
-      const container = document.querySelector(".container");
-      const indexItem = parseInt(id.value);
-      const studentEdit = await GetStudentFromServerID(indexItem);
-      ClearPageTable();
-      container.append(AddStudent(studentEdit));
+    editButton.addEventListener("click", function () {
+      $('#myModal').modal(options)
     });
 
     fullName.textContent = GetFullName(clientObj);
