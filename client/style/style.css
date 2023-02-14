@@ -1,31 +1,32 @@
 @font-face {
-  font-family: 'OpenSans';
-  src: url('../fonts/OpenSans-Regular.woff') format('woff');
+  font-family: "OpenSans";
+  src: url("../fonts/OpenSans-Regular.woff") format("woff");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'OpenSans';
-  src: url('../fonts/OpenSans-SemiBold.woff') format('woff');
+  font-family: "OpenSans";
+  src: url("../fonts/OpenSans-SemiBold.woff") format("woff");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'OpenSans';
-  src: url('../fonts/OpenSans-Bold.woff') format('woff');
+  font-family: "OpenSans";
+  src: url("../fonts/OpenSans-Bold.woff") format("woff");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
 :root {
-  --color-fonts-attn: #9873FF;
-  --color-background:#F5F5F5;
-  --color-fonts:#B0B0B0;
+  --color-fonts-attn: #9873ff;
+  --color-background: #f5f5f5;
+  --color-fonts: #b0b0b0;
+  --color-line: #c8c5d1;
 }
 
 h1,
@@ -40,13 +41,14 @@ p {
 }
 
 html {
-  font-family: 'OpenSans Roboto';
   font-style: normal;
 }
 
 body {
+  font-family: "OpenSans";
+
   color: var(--color-fonts);
-  background-color:#fff;
+  background-color: #fff;
 }
 
 a {
@@ -57,7 +59,6 @@ a {
 img {
   width: 100%;
 }
-
 
 .list-reset {
   padding: 0;
@@ -73,37 +74,47 @@ img {
   max-width: 1024px;
   margin: 0 auto;
   padding: 20px;
-  background-color:#fff;
+  background-color: #fff;
   offset: 0px, 3.39px rgba(176, 190, 197, 0.32);
 }
 
 .logo {
-  margin-right: 53px;
+  margin-right: 38px;
 }
 
 .header__logo {
+  display: flex;
   width: 50px;
   height: 50px;
-  background-color: #9873FF;
+  background-color: #9873ff;
   border-radius: 100%;
-  text-align: center;
-
+  justify-content: center;
+  align-items: center;
 }
-.input-group{
+
+.header__group {
   width: 581px;
   height: 44px;
+  padding: 0;
 }
 
 .header__input {
-  border: 1px solid #B0B0B0;
-  color:#B0B0B0;
+  height: 100%;
+  border-radius: 0;
+  font-size: 14px;
+  line-height: 19px;
+  font-style: 400;
+  padding: 19px 12px;
+  border: 1px solid #b0b0b0;
+  color: #b0b0b0;
 }
 
-.header__logo-title {
-
-
+.header__logo--title {
+  display: inline-block;
+  font-size: 18px;
+  line-height: 25px;
+  font-weight: 700;
 }
-
 
 /* clients */
 
@@ -111,12 +122,12 @@ img {
   position: relative;
   max-width: 1024px;
   margin: 0 auto;
-  padding: 20px 10px;
-  background-color: #F5F5F5;
+  padding: 40px 20px;
+  background-color: #f5f5f5;
 }
 
 .clients__title {
-  margin-bottom: 28px;
+  margin-bottom: 0;
   font-size: 24px;
   font-weight: 700;
   line-height: 32px;
@@ -129,11 +140,11 @@ img {
   font-size: 18px;
   line-height: 21px;
   text-align: center;
-  border: 1px solid #9873FF;
+  border: 1px solid #9873ff;
   border-radius: 0;
-  color: #9873FF;
-  background-image: url('../img/btn.svg');
-  background-repeat:no-repeat;
+  color: #9873ff;
+  background-image: url("../img/btn.svg");
+  background-repeat: no-repeat;
   background-position: center;
   background-position-x: left;
 }
@@ -142,4 +153,83 @@ img {
   width: 100%;
 }
 
+.table__header {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--color-fonts);
+}
 
+.table__header--arrow {
+  width: 12px;
+}
+
+.table__content {
+  background-color: #fff;
+}
+
+.table__row {
+  border-bottom: 1px solid var(--color-fonts);
+}
+
+.table__clientId {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  color: var(--color-fonts);
+}
+
+.table td,
+.table th {
+  vertical-align: middle;
+  padding: 0.625rem;
+}
+
+.table__range {
+  font-size: 14px;
+  line-height: 19px;
+  font-weight: 400;
+  color: #333;
+  padding: 0;
+}
+
+.table__date{
+
+}
+
+.table__time {
+  padding-left: 5px;
+  color: var(--color-fonts);
+}
+
+/* modal */
+
+.modal__header {
+  border: 0;
+  align-items: flex-end;
+}
+
+.modal__title {
+  margin-right: 9px;
+  font-size: 18px;
+  line-height: 24.5px;
+  color: #333;
+}
+
+.modal__id {
+  font-size: 12px;
+  font-weight: 16px;
+  color: #b0b0b0;
+}
+
+.form__input--group {
+  border-bottom: 1px solid var(--color-line);
+}
+
+.form__input--text {
+  border: 0;
+}
+
+.form-group__contacts {
+  padding: 15px 30px;
+  background-color: #c8c5d1;
+}

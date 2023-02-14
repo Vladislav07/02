@@ -12,8 +12,8 @@
       crossorigin="anonymous"
     />
     <!-- <link rel="stylesheet" href="style/bootstrap-grid.min.css" /> -->
-    <link rel="stylesheet" href="style/style.css" />
-    <link rel="stylesheet" href="style/style-mobile.css" />
+    <link rel="stylesheet" type="text/css" href="style/style.css" />
+    <link rel="stylesheet" type="text/css" href="style/style-mobile.css" />
     <title>Сетки_Д3</title>
     <script
       defer
@@ -29,20 +29,21 @@
     ></script>
     <script defer src="./main.js"></script>
   </head>
+
   <body>
     <header class="header">
       <div class="container header__container">
         <div class="row justify-items-start align-items-center">
           <a class="col-auto logo">
             <div class="header__logo">
-              <span header__logo-title>skb.</span>
+              <span class="header__logo--title">skb.</span>
             </div>
           </a>
-          <div class="col-auto input-group input-group-lg">
+          <div class="col-auto input-group header__group">
             <input
               type="text"
               class="form-control header__input"
-              placeholder="Имя пользователя"
+              placeholder="Введите запрос"
               aria-label="поле ввода запроса"
               aria-describedby=""
             />
@@ -54,15 +55,38 @@
       <section class="clients">
         <div class="container clients__container">
           <h1 class="clients__title">Клиенты</h1>
-          <table class="table">
+          <table class="table table-borderless">
             <thead>
               <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Фамилия Имя Отчество</th>
-                <th scope="col">Дата и время создания</th>
-                <th scope="col">Последние изменения</th>
-                <th scope="col">Контакты</th>
-                <th scope="col">Действия</th>
+                <th scope="col" class="table__header">
+                  ID
+                  <img
+                    class="table__header--arrow"
+                    src="./img/arrow_downward.svg"
+                    alt=""
+                  />
+                </th>
+                <th scope="col" class="table__header">Фамилия Имя Отчество</th>
+                <th scope="col" class="table__header">
+                  Дата и время создания
+                  <img
+                    class="table__header--arrow"
+                    src="./img/arrow_downward.svg"
+                    alt=""
+                  />
+                </th>
+                <th scope="col" class="table__header"></th>
+                <th scope="col" class="table__header">
+                  Последние изменения
+                  <img
+                    class="table__header--arrow"
+                    src="./img/arrow_downward.svg"
+                    alt=""
+                  />
+                </th>
+                <th scope="col" class="table__header"></th>
+                <th scope="col" class="table__header">Контакты</th>
+                <th scope="col" class="table__header">Действия</th>
               </tr>
             </thead>
           </table>
@@ -75,7 +99,88 @@
         </div>
       </section>
     </main>
-    <div
+    <div id="my1" class="modal fade" style="display: none" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content modal-body">
+          <div class="modal-header modal__header">
+            <h5 class="modal-title modal__title">Изменить данные</h5>
+            <div class="modal__id">id: 1234567890</div>
+            <button
+              type="button"
+              data-dismiss="modal"
+              aria-label="Close"
+              class="close"
+            >
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <form>
+            <div class="form-group form__input--group">
+              <label class="col-form-label" for="surname">Фамилия*</label
+              ><input
+                id="surname"
+                type="text"
+                class="form-control form__input--text"
+                value="ggggg"
+              />
+            </div>
+            <div class="form-group form__input--group">
+              <label class="col-form-label" for="name">Имя*</label
+              ><input
+                id="name"
+                type="text"
+                class="form-control form__input--text"
+                value="ggggg"
+              />
+            </div>
+            <div class="form-group form__input--group">
+              <label class="col-form-label" for="lastName">Отчество*</label
+              ><input
+                id="lastName"
+                type="text"
+                class="form-control form__input--text"
+                value="ggggg"
+              />
+            </div>
+            <div class="form-group__contacts">
+              <div class="input-group">
+                <select
+                  class="custom-select"
+                  id="inputGroupSelect04"
+                  aria-label="Пример выбора с помощью надстройки кнопки"
+                >
+                  <option selected>Выбрать...</option>
+                  <option value="1">Один</option>
+                  <option value="2">Два</option>
+                  <option value="3">Три</option>
+                </select>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Имя пользователя"
+                  aria-label="Имя пользователя"
+                  aria-describedby="addon2"
+                />
+                <div class="input-group-append">
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    id="addon2"
+                  >
+                    Кнопка
+                  </button>
+                </div>
+              </div>
+              <button class="btn btn-secondary" type="button" my-n-1>
+                Добавить контакт
+              </button>
+            </div>
+          </form>
+          <div class="modal-footer"></div>
+        </div>
+      </div>
+    </div>
+    <!-- <div
       class="modal fade"
       id="myModal"
       tabindex="-1"
@@ -97,17 +202,24 @@
           </div>
           <div class="modal-body">
             <form>
-              <div class="form-group">
-                <label for="recipient-name" class="col-form-label"
-                  >Получатель:</label
+              <div class="input-group">
+                <select
+                  class="custom-select"
+                  id="inputGroupSelect04"
+                  aria-label="Пример выбора с помощью надстройки кнопки"
                 >
-                <input type="text" class="form-control" id="recipient-name" />
-              </div>
-              <div class="form-group">
-                <label for="message-text" class="col-form-label"
-                  >Сообщение:</label
-                >
-                <textarea class="form-control" id="message-text"></textarea>
+                  <option selected>Выбрать...</option>
+                  <option value="1">Один</option>
+                  <option value="2">Два</option>
+                  <option value="3">Три</option>
+                </select>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Имя пользователя"
+                  aria-label="Имя пользователя"
+                  aria-describedby="addon-wrapping"
+                />
               </div>
             </form>
           </div>
@@ -125,6 +237,6 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </body>
 </html>
