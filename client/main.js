@@ -140,7 +140,7 @@
     });
 
     editButton.addEventListener("click", function () {
-      $('#myModal').modal(options)
+      $('#myModal').modal('show')
     });
 
     fullName.textContent = GetFullName(clientObj);
