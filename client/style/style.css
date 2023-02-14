@@ -233,3 +233,12 @@ img {
   padding: 15px 30px;
   background-color: #c8c5d1;
 }
+
+.custom-select {
+  width: 40%;
+}
+
+.form-control__contact {
+  display: inline-block;
+  width: 40%;
+}

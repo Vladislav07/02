@@ -150,9 +150,9 @@
     editButton.addEventListener("click", function () {
       // $("#myModal").modal("show");
 
-      //  ModalWindows(clientObj);
+      ModalWindows(clientObj);
 
-      $("#my1").modal("show");
+      $("#my").modal("show");
     });
 
     fullName.textContent = GetFullName(clientObj);
@@ -226,6 +226,7 @@
     if (client) {
       modalTitle.textContent = "Изменить данные";
       clientId.textContent = "id: " + client.id;
+      displeyContacts(client.contacts, modalform)
     } else {
       modalTitle.textContent = "Новый клиент";
     }
@@ -240,12 +241,88 @@
     modalContent.append(modalBody);
     const modalFooter = document.createElement("div");
     modalFooter.classList.add("modal-footer");
+
     const btnAddContact = GetButton("Добавить контакт");
+    btnAddContact.addEventListener('click', () => {
+      modalform.append(GetInputContact());
+    })
     modalFooter.append(btnAddContact);
     modalContent.append(modalFooter);
     dialog.append(modalContent);
     modalClient.append(dialog);
     parent.after(modalClient);
+  }
+
+  function GetInputContact(contact) {
+    const typeContacts = ['Телефон', 'Email', 'Vk', 'Facebook']
+
+    const formGroup = document.createElement("div");
+    formGroup.classList.add("form-group");
+
+    const formGroupAppend = document.createElement("div");
+    formGroupAppend.classList.add("form-group-append");
+
+    const formselect = document.createElement("select");
+    formselect.classList.add("custom-select");
+    formselect.setAttribute('id', 'select');
+
+    const formInput = document.createElement("input");
+    formInput.setAttribute("placeholder", "Введите данные контакты");
+    formInput.classList.add("form-control", "form-control__contact");
+
+    typeContacts.forEach(el => {
+      const option = document.createElement("option");
+      option.setAttribute('value', el);
+      option.text = el;
+      formselect.append(option);
+    });
+    let selectedOptions = '';
+    formselect.addEventListener('change', () => {
+      selectedOptions = formselect.options[formselect.selectedIndex];
+      switch (selectedOptions.text) {
+        case "Телефон":
+          formInput.setAttribute("type", "tel");
+          break;
+        case "email":
+          formInput.setAttribute("type", "email");
+          break;
+        case "Vk", "Fb":
+          formInput.setAttribute("type", "url");
+          break;
+        default:
+          break;
+      }
+    })
+    if (contact) {
+
+      formselect.value = contact.type;
+      formInput.value = contact.value;
+      AddButtonDeleteContact(formGroup);
+
+    }
+    formGroup.append(formselect);
+    formInput.setAttribute("aria-describedby", selectedOptions.text);
+    formGroup.append(formInput);
+    return formGroup;
+  }
+
+  function AddButtonDeleteContact(tag) {
+    const groupAppend=document.createElement('div');
+    groupAppend.classList.add('input-group-append');
+    const btn = document.createElement('button');
+    btn.classList.add('btn','btn-outline-secondary');
+    btn.setAttribute('type', 'button');
+    btn.innerHTML = "&#215";
+    groupAppend.append(btn);
+    tag.append(groupAppend);
+  }
+
+  function displeyContacts(contacts, tag) {
+
+    contacts.forEach(c => {
+      const contact = Object.entries(c);
+      tag.append(GetInputContact(c))
+    })
   }
 
   function GetInput(prop, value) {
