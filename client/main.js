@@ -203,12 +203,14 @@
     const dialog = document.createElement("div");
     dialog.classList.add("modal-dialog");
     const modalContent = document.createElement("div");
-    modalContent.classList.add("modal-content");
+    modalContent.classList.add("modal-content", "modal-body");
     const modalHeader = document.createElement("div");
-    modalHeader.classList.add("modal-header");
+    modalHeader.classList.add("modal-header", "modal__header", "p-0");
     const modalTitle = document.createElement("h5");
-    modalTitle.classList.add("modal-title");
+    
+    modalTitle.classList.add("modal-title", "modal__title");
     const clientId = document.createElement("div");
+    clientId.classList.add("modal__id");
     const btnClose = document.createElement("button");
     btnClose.setAttribute("type", "button");
     btnClose.setAttribute("data-dismiss", "modal");
@@ -219,17 +221,11 @@
     iconBtn.innerHTML = "&#215";
     btnClose.append(iconBtn);
     const modalBody = document.createElement("div");
-    modalContent.classList.add("modal-body");
     const modalform = document.createElement("form");
     modalContent.classList.add("modal__form");
 
-    if (client) {
-      modalTitle.textContent = "Изменить данные";
-      clientId.textContent = "id: " + client.id;
-      displeyContacts(client.contacts, modalform)
-    } else {
-      modalTitle.textContent = "Новый клиент";
-    }
+
+
     modalHeader.append(modalTitle);
     modalHeader.append(clientId);
     modalHeader.append(btnClose);
@@ -240,12 +236,23 @@
     modalBody.append(modalform);
     modalContent.append(modalBody);
     const modalFooter = document.createElement("div");
-    modalFooter.classList.add("modal-footer");
+    modalFooter.classList.add("modal-footer","d-flex", "justify-content-center");
+
+    if (client) {
+      modalTitle.textContent = "Изменить данные";
+      clientId.textContent = "id: " + client.id;
+      displeyContacts(client.contacts, modalform)
+    } else {
+      modalTitle.textContent = "Новый клиент";
+    }
+
 
     const btnAddContact = GetButton("Добавить контакт");
     btnAddContact.addEventListener('click', () => {
       modalform.append(GetInputContact());
     })
+
+
     modalFooter.append(btnAddContact);
     modalContent.append(modalFooter);
     dialog.append(modalContent);
@@ -293,28 +300,29 @@
           break;
       }
     })
-    if (contact) {
-
-      formselect.value = contact.type;
-      formInput.value = contact.value;
-      AddButtonDeleteContact(formGroup);
-
-    }
+    
     formGroup.append(formselect);
     formInput.setAttribute("aria-describedby", selectedOptions.text);
     formGroup.append(formInput);
+
+    if (contact) {
+      formselect.value = contact.type;
+      formInput.value = contact.value;
+      AddButtonDeleteContact(formGroup);
+    }
+
     return formGroup;
   }
 
   function AddButtonDeleteContact(tag) {
-    const groupAppend=document.createElement('div');
+    const groupAppend = document.createElement('div');
     groupAppend.classList.add('input-group-append');
     const btn = document.createElement('button');
-    btn.classList.add('btn','btn-outline-secondary');
+    btn.classList.add('btn', 'btn-outline-secondary');
     btn.setAttribute('type', 'button');
     btn.innerHTML = "&#215";
     groupAppend.append(btn);
-    tag.append(groupAppend);
+    tag.append(btn);
   }
 
   function displeyContacts(contacts, tag) {
@@ -327,14 +335,14 @@
 
   function GetInput(prop, value) {
     const formGroup = document.createElement("div");
-    formGroup.classList.add("form-group");
+    formGroup.classList.add("form-group","form__input--group");
     const formLabel = document.createElement("label");
-    formLabel.classList.add("col-form-label");
+    formLabel.classList.add("col-form-label", "form__label", "p-0");
     const formInput = document.createElement("input");
     formInput.setAttribute("id", prop);
     formInput.setAttribute("type", "text");
     formLabel.setAttribute("for", prop);
-    formInput.classList.add("form-control");
+    formInput.classList.add("form-control", "form__input--text", "p-0");
     switch (prop) {
       case "surname":
         formLabel.textContent = "Фамилия*";
@@ -359,7 +367,7 @@
 
   function GetButton(params) {
     const btn = document.createElement("button");
-    btn.classList.add("btn", "btn-secondary");
+    btn.classList.add("btn","btn__custom");
     btn.setAttribute("type", "button");
     btn.textContent = params;
     return btn;
