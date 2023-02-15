@@ -123,14 +123,9 @@
     const actions = getRangeTd();
 
     const buttonGroup = document.createElement("div");
-    const editButton = document.createElement("button");
-    const deleteButton = document.createElement("button");
+    const editButton = GetButton("Редактировать", "./img/edit.svg");
+    const deleteButton = GetButton("Удалить", "./img/cancel.svg");
     buttonGroup.classList.add("btn-group", "btn-group");
-    editButton.classList.add("btn", "btn-success");
-    editButton.setAttribute("type", "button");
-    editButton.textContent = "Редактировать";
-    deleteButton.classList.add("btn", "btn-danger");
-    deleteButton.textContent = "Удалить";
     buttonGroup.append(editButton);
     buttonGroup.append(deleteButton);
     actions.append(buttonGroup);
@@ -148,10 +143,7 @@
     });
 
     editButton.addEventListener("click", function () {
-      // $("#myModal").modal("show");
-
       ModalWindows(clientObj);
-
       $("#my").modal("show");
     });
 
@@ -207,7 +199,7 @@
     const modalHeader = document.createElement("div");
     modalHeader.classList.add("modal-header", "modal__header", "p-0");
     const modalTitle = document.createElement("h5");
-    
+
     modalTitle.classList.add("modal-title", "modal__title");
     const clientId = document.createElement("div");
     clientId.classList.add("modal__id");
@@ -224,44 +216,140 @@
     const modalform = document.createElement("form");
     modalContent.classList.add("modal__form");
 
-
-
     modalHeader.append(modalTitle);
     modalHeader.append(clientId);
     modalHeader.append(btnClose);
     modalContent.append(modalHeader);
-    modalform.append(GetInput("surname", client.surname));
-    modalform.append(GetInput("name", client.name));
-    modalform.append(GetInput("lastName", client.lastName));
+
     modalBody.append(modalform);
     modalContent.append(modalBody);
     const modalFooter = document.createElement("div");
-    modalFooter.classList.add("modal-footer","d-flex", "justify-content-center");
+    modalFooter.classList.add(
+      "modal-footer",
+      "d-flex",
+      "flex-column",
+      "justify-content-center"
+    );
 
     if (client) {
       modalTitle.textContent = "Изменить данные";
       clientId.textContent = "id: " + client.id;
-      displeyContacts(client.contacts, modalform)
+      modalform.append(GetInput("name", client.name));
+      modalform.append(GetInput("lastName", client.lastName));
+      modalform.append(GetInput("surname", client.surname));
+      displeyContacts(client.contacts, modalform);
     } else {
       modalTitle.textContent = "Новый клиент";
+      modalform.append(GetInput("name"));
+      modalform.append(GetInput("lastName"));
+      modalform.append(GetInput("surname"));
     }
 
-
-    const btnAddContact = GetButton("Добавить контакт");
-    btnAddContact.addEventListener('click', () => {
+    const btnAddContact = GetButton(
+      "Добавить контакт",
+      "./img/add_circle_outline.svg"
+    );
+    btnAddContact.addEventListener("click", () => {
       modalform.append(GetInputContact());
-    })
+    });
 
-
-    modalFooter.append(btnAddContact);
+    modalform.append(btnAddContact);
+    const btnSave = GetButton("Сохранить");
+    btnSave.setAttribute("type", "submit");
+    const btnDeleteContact = GetButton("Удалить клиента");
+    modalform.append(btnSave);
+    modalform.append(btnDeleteContact);
     modalContent.append(modalFooter);
     dialog.append(modalContent);
     modalClient.append(dialog);
     parent.after(modalClient);
+
+    modalform.addEventListener("submit", (e) => {
+      e.preventDefault();
+      SaveServerClient();
+    });
+  }
+
+  function SaveServerClient() {
+    const arrayClient = document.querySelectorAll("form > div > input");
+    const clientForm = {};
+    clientForm.contacts = [];
+    arrayClient.forEach((field) => {
+      switch (field.getAttribute("name")) {
+        case "name":
+          clientForm.name = field.value;
+          break;
+        case "surname":
+          clientForm.surname = field.value;
+          break;
+        case "lastName":
+          clientForm.lastName = field.value;
+          break;
+        case "Email":
+          clientForm.contacts.push({ Email: field.value });
+          break;
+        case "Vk":
+          clientForm.contacts.push({ Vk: field.value });
+          break;
+        case "Other":
+          clientForm.contacts.push({ Other: field.value });
+          break;
+        case "Facebook":
+          clientForm.contacts.push({ Facebook: field.value });
+          break;
+
+        default:
+          break;
+      }
+
+    });
+console.log(clientForm);
+    // let isValidName = ValidFieldsNull(inputName);
+    // let isValidSurName = ValidFieldsNull(inputSurName);
+    // let isValidLastName = ValidFieldsNull(inputLastName);
+    // let isValidDepName = ValidFieldsNull(inputcontacts);
+    // let IsValidupdatedAt = ValidFildDateBirth(
+    //   inputDateOfBirth,
+    //   validDateOfBirth
+    // );
+    // let IsValidYearsStudy = ValidFieldYearsStudy(
+    //   inputYearOfStudy,
+    //   validYearOfStudy
+    // );
+
+    // if (
+    //   !isValidName ||
+    //   !isValidSurName ||
+    //   !isValidLastName ||
+    //   !isValidDepName ||
+    //   !IsValidupdatedAt ||
+    //   !IsValidYearsStudy
+    // ) {
+    //   event.preventDefault();
+    //   event.stopPropagation();
+    //   return;
+    // }
+
+
+    // if (studentFromServer) {
+    //   student.id = studentId;
+    //   const res = EditingStudentToServer(student);
+    //   if (!res.ok) {
+    //     return;
+    //   }
+    // } else {
+    //   const res = AddStudentToServer(student);
+    //   if (!res.ok) {
+    //     return;
+    //   }
+    // }
+    // clientsList = GetclientsFromServer();
+    // form.remove();
+    // renderclientsTable(clientsList);
   }
 
   function GetInputContact(contact) {
-    const typeContacts = ['Телефон', 'Email', 'Vk', 'Facebook']
+    const typeContacts = ["Телефон", "Email", "Vk", "Facebook", "Другое"];
 
     const formGroup = document.createElement("div");
     formGroup.classList.add("form-group");
@@ -271,42 +359,59 @@
 
     const formselect = document.createElement("select");
     formselect.classList.add("custom-select");
-    formselect.setAttribute('id', 'select');
+    formselect.setAttribute("id", "select");
 
     const formInput = document.createElement("input");
     formInput.setAttribute("placeholder", "Введите данные контакты");
     formInput.classList.add("form-control", "form-control__contact");
 
-    typeContacts.forEach(el => {
+    typeContacts.forEach((el) => {
       const option = document.createElement("option");
-      option.setAttribute('value', el);
+      option.setAttribute("value", el);
       option.text = el;
       formselect.append(option);
     });
-    let selectedOptions = '';
-    formselect.addEventListener('change', () => {
+    let selectedOptions = "";
+
+    formselect.addEventListener("change", () => {
       selectedOptions = formselect.options[formselect.selectedIndex];
-      switch (selectedOptions.text) {
+      addType(selectedOptions.text);
+    });
+
+    function addType(prop) {
+      switch (prop) {
         case "Телефон":
           formInput.setAttribute("type", "tel");
+          formInput.setAttribute("name", "tel");
           break;
-        case "email":
-          formInput.setAttribute("type", "email");
+        case "Email":
+          formInput.setAttribute("type", "Email");
+          formInput.setAttribute("name", "Email");
           break;
-        case "Vk", "Fb":
+        case "Vk":
           formInput.setAttribute("type", "url");
+          formInput.setAttribute("name", "Vk");
+          break;
+        case "Facebook":
+          formInput.setAttribute("type", "url");
+          formInput.setAttribute("name", "Facebook");
+          break;
+        case "Другое":
+          formInput.setAttribute("type", "text");
+          formInput.setAttribute("name", "Other");
           break;
         default:
           break;
       }
-    })
-    
+    }
+
     formGroup.append(formselect);
     formInput.setAttribute("aria-describedby", selectedOptions.text);
     formGroup.append(formInput);
 
     if (contact) {
       formselect.value = contact.type;
+      addType(contact.type);
       formInput.value = contact.value;
       AddButtonDeleteContact(formGroup);
     }
@@ -315,31 +420,31 @@
   }
 
   function AddButtonDeleteContact(tag) {
-    const groupAppend = document.createElement('div');
-    groupAppend.classList.add('input-group-append');
-    const btn = document.createElement('button');
-    btn.classList.add('btn', 'btn-outline-secondary');
-    btn.setAttribute('type', 'button');
+    const groupAppend = document.createElement("div");
+    groupAppend.classList.add("input-group-append");
+    const btn = document.createElement("button");
+    btn.classList.add("btn", "btn-outline-secondary");
+    btn.setAttribute("type", "button");
     btn.innerHTML = "&#215";
     groupAppend.append(btn);
     tag.append(btn);
   }
 
   function displeyContacts(contacts, tag) {
-
-    contacts.forEach(c => {
+    contacts.forEach((c) => {
       const contact = Object.entries(c);
-      tag.append(GetInputContact(c))
-    })
+      tag.append(GetInputContact(c));
+    });
   }
 
   function GetInput(prop, value) {
     const formGroup = document.createElement("div");
-    formGroup.classList.add("form-group","form__input--group");
+    formGroup.classList.add("form-group", "form__input--group");
     const formLabel = document.createElement("label");
     formLabel.classList.add("col-form-label", "form__label", "p-0");
     const formInput = document.createElement("input");
     formInput.setAttribute("id", prop);
+    formInput.setAttribute("name", prop);
     formInput.setAttribute("type", "text");
     formLabel.setAttribute("for", prop);
     formInput.classList.add("form-control", "form__input--text", "p-0");
@@ -357,19 +462,27 @@
       default:
         break;
     }
-    formInput.value = value;
 
+    if (value) {
+      formInput.value = value;
+    }
     formGroup.append(formLabel);
     formGroup.append(formInput);
 
     return formGroup;
   }
 
-  function GetButton(params) {
+  function GetButton(text, imgUrl) {
     const btn = document.createElement("button");
-    btn.classList.add("btn","btn__custom");
+    btn.classList.add("btn", "btn__custom");
     btn.setAttribute("type", "button");
-    btn.textContent = params;
+    btn.textContent = text;
+    if (imgUrl) {
+      const img = document.createElement("img");
+      img.setAttribute("src", imgUrl);
+      img.classList.add("btn__icon");
+      btn.append(img);
+    }
     return btn;
   }
 
@@ -496,102 +609,162 @@
     return tBody;
   }
 
-  function ClearPageTable() {
-    let array = document.querySelector(".container").children;
-    for (let index = array.length - 1; index >= 0; index--) {
-      const el = array[index];
-      el.remove();
-    }
-  }
+  // function SaveServerClient(event) {
+  //   let nameOut = inputName.value;
+  //   let surNameOut = inputSurName.value;
+  //   let lastNameOut = inputLastName.value;
+  //   let contactsOut = inputcontacts.value;
+  //   let yearOfStudyOut = inputYearOfStudy.valueAsDate;
+  //   let dateOfBirthOut = inputDateOfBirth.valueAsDate;
 
-  function CreateGroupFilter() {
-    let arrFilterName = clientsList;
-    let arrFilterDep = arrFilterName;
-    let arrFilterStartStydy = arrFilterDep;
-    const filter = document.createElement("div");
-    const inputGroup = document.createElement("div");
-    inputGroup.classList.add("input-group", "my-5");
+  //   let isValidName = ValidFieldsNull(inputName);
+  //   let isValidSurName = ValidFieldsNull(inputSurName);
+  //   let isValidLastName = ValidFieldsNull(inputLastName);
+  //   let isValidDepName = ValidFieldsNull(inputcontacts);
+  //   let IsValidupdatedAt = ValidFildDateBirth(
+  //     inputDateOfBirth,
+  //     validDateOfBirth
+  //   );
+  //   let IsValidYearsStudy = ValidFieldYearsStudy(
+  //     inputYearOfStudy,
+  //     validYearOfStudy
+  //   );
 
-    const labelFullName = document.createElement("label");
-    labelFullName.setAttribute("for", "fullName");
-    const inputFullName = document.createElement("input");
-    inputFullName.setAttribute("type", "text");
-    inputFullName.setAttribute("placeholder", "Ф. И. О.");
-    inputFullName.setAttribute("id", "fullName");
-    inputFullName.classList.add("form-control");
-    inputFullName.addEventListener("input", (e) => {
-      arrFilterName = FilteringFullName(clientsList, inputFullName.value);
-      let table = document.querySelector("table");
-      let tBody = document.querySelector("tbody");
-      tBody.remove();
-      tBody = Renderclients(arrFilterName);
-      table.append(tBody);
-    });
-    inputGroup.append(inputFullName);
+  //   if (
+  //     !isValidName ||
+  //     !isValidSurName ||
+  //     !isValidLastName ||
+  //     !isValidDepName ||
+  //     !IsValidupdatedAt ||
+  //     !IsValidYearsStudy
+  //   ) {
+  //     event.preventDefault();
+  //     event.stopPropagation();
+  //     return;
+  //   }
+  //   const student = {
+  //     name: nameOut,
+  //     surname: surNameOut,
+  //     lastname: lastNameOut,
+  //     birthday: dateOfBirthOut,
+  //     studyStart: yearOfStudyOut.getFullYear().toString(),
+  //     faculty: contactsOut,
+  //   };
 
-    const labelcontacts = document.createElement("label");
-    labelcontacts.setAttribute("for", "faculty");
-    const inputcontacts = document.createElement("input");
-    inputcontacts.setAttribute("type", "text");
-    inputcontacts.setAttribute("placeholder", "факультет");
-    inputcontacts.setAttribute("id", "faculty");
-    inputcontacts.classList.add("form-control");
-    inputcontacts.addEventListener("input", (e) => {
-      arrFilterDep = Filtering(arrFilterName, "faculty", inputcontacts.value);
-      let table = document.querySelector("table");
-      let tBody = document.querySelector("tbody");
-      tBody.remove();
-      tBody = Renderclients(arrFilterDep);
-      table.append(tBody);
-    });
+  //   if (studentFromServer) {
+  //     student.id = studentId;
+  //     const res = EditingStudentToServer(student);
+  //     if (!res.ok) {
+  //       return;
+  //     }
+  //   } else {
+  //     const res = AddStudentToServer(student);
+  //     if (!res.ok) {
+  //       return;
+  //     }
+  //   }
+  //   clientsList = GetclientsFromServer();
+  //   form.remove();
+  //   renderclientsTable(clientsList);
+  // }
+  //--------------------------------------------------------------------
+  // function ClearPageTable() {
+  //   let array = document.querySelector(".container").children;
+  //   for (let index = array.length - 1; index >= 0; index--) {
+  //     const el = array[index];
+  //     el.remove();
+  //   }
+  // }
 
-    inputGroup.append(inputcontacts);
-    const labelYearOfStudy = document.createElement("label");
-    labelYearOfStudy.setAttribute("for", "studyStart");
-    const inputYearOfStudy = document.createElement("input");
-    inputYearOfStudy.setAttribute("type", "text");
-    inputYearOfStudy.setAttribute("placeholder", "Год начала обучения");
-    inputYearOfStudy.setAttribute("id", "studyStart");
-    inputYearOfStudy.classList.add("form-control");
-    inputYearOfStudy.addEventListener("input", (e) => {
-      arrFilterStartStydy = Filtering(
-        arrFilterDep,
-        "studyStart",
-        inputYearOfStudy.value
-      );
-      let table = document.querySelector("table");
-      let tBody = document.querySelector("tbody");
-      tBody.remove();
-      tBody = Renderclients(arrFilterStartStydy);
-      table.append(tBody);
-    });
+  // function CreateGroupFilter() {
+  //   let arrFilterName = clientsList;
+  //   let arrFilterDep = arrFilterName;
+  //   let arrFilterStartStydy = arrFilterDep;
+  //   const filter = document.createElement("div");
+  //   const inputGroup = document.createElement("div");
+  //   inputGroup.classList.add("input-group", "my-5");
 
-    inputGroup.append(inputYearOfStudy);
+  //   const labelFullName = document.createElement("label");
+  //   labelFullName.setAttribute("for", "fullName");
+  //   const inputFullName = document.createElement("input");
+  //   inputFullName.setAttribute("type", "text");
+  //   inputFullName.setAttribute("placeholder", "Ф. И. О.");
+  //   inputFullName.setAttribute("id", "fullName");
+  //   inputFullName.classList.add("form-control");
 
-    const labelYearOfEnding = document.createElement("label");
-    labelYearOfEnding.setAttribute("for", "YearOfEnding");
-    const inputYearOfEnding = document.createElement("input");
-    inputYearOfEnding.setAttribute("type", "text");
-    inputYearOfEnding.setAttribute("placeholder", "Год окончания обучения");
-    inputYearOfEnding.setAttribute("id", "YearOfEnding");
-    inputYearOfEnding.classList.add("form-control");
-    inputYearOfEnding.addEventListener("input", (e) => {
-      let result = FilteringEndStudy(
-        arrFilterStartStydy,
-        inputYearOfEnding.value
-      );
-      let table = document.querySelector("table");
-      let tBody = document.querySelector("tbody");
-      tBody.remove();
-      tBody = Renderclients(result);
-      table.append(tBody);
-    });
+  //   inputFullName.addEventListener("input", (e) => {
+  //     arrFilterName = FilteringFullName(clientsList, inputFullName.value);
+  //     let table = document.querySelector("table");
+  //     let tBody = document.querySelector("tbody");
+  //     tBody.remove();
+  //     tBody = Renderclients(arrFilterName);
+  //     table.append(tBody);
+  //   });
+  //   inputGroup.append(inputFullName);
 
-    inputGroup.append(inputYearOfEnding);
-    filter.append(inputGroup);
+  //   const labelcontacts = document.createElement("label");
+  //   labelcontacts.setAttribute("for", "faculty");
+  //   const inputcontacts = document.createElement("input");
+  //   inputcontacts.setAttribute("type", "text");
+  //   inputcontacts.setAttribute("placeholder", "факультет");
+  //   inputcontacts.setAttribute("id", "faculty");
+  //   inputcontacts.classList.add("form-control");
+  //   inputcontacts.addEventListener("input", (e) => {
+  //     arrFilterDep = Filtering(arrFilterName, "faculty", inputcontacts.value);
+  //     let table = document.querySelector("table");
+  //     let tBody = document.querySelector("tbody");
+  //     tBody.remove();
+  //     tBody = Renderclients(arrFilterDep);
+  //     table.append(tBody);
+  //   });
 
-    return filter;
-  }
+  //   inputGroup.append(inputcontacts);
+  //   const labelYearOfStudy = document.createElement("label");
+  //   labelYearOfStudy.setAttribute("for", "studyStart");
+  //   const inputYearOfStudy = document.createElement("input");
+  //   inputYearOfStudy.setAttribute("type", "text");
+  //   inputYearOfStudy.setAttribute("placeholder", "Год начала обучения");
+  //   inputYearOfStudy.setAttribute("id", "studyStart");
+  //   inputYearOfStudy.classList.add("form-control");
+  //   inputYearOfStudy.addEventListener("input", (e) => {
+  //     arrFilterStartStydy = Filtering(
+  //       arrFilterDep,
+  //       "studyStart",
+  //       inputYearOfStudy.value
+  //     );
+  //     let table = document.querySelector("table");
+  //     let tBody = document.querySelector("tbody");
+  //     tBody.remove();
+  //     tBody = Renderclients(arrFilterStartStydy);
+  //     table.append(tBody);
+  //   });
+
+  //   inputGroup.append(inputYearOfStudy);
+
+  //   const labelYearOfEnding = document.createElement("label");
+  //   labelYearOfEnding.setAttribute("for", "YearOfEnding");
+  //   const inputYearOfEnding = document.createElement("input");
+  //   inputYearOfEnding.setAttribute("type", "text");
+  //   inputYearOfEnding.setAttribute("placeholder", "Год окончания обучения");
+  //   inputYearOfEnding.setAttribute("id", "YearOfEnding");
+  //   inputYearOfEnding.classList.add("form-control");
+  //   inputYearOfEnding.addEventListener("input", (e) => {
+  //     let result = FilteringEndStudy(
+  //       arrFilterStartStydy,
+  //       inputYearOfEnding.value
+  //     );
+  //     let table = document.querySelector("table");
+  //     let tBody = document.querySelector("tbody");
+  //     tBody.remove();
+  //     tBody = Renderclients(result);
+  //     table.append(tBody);
+  //   });
+
+  //   inputGroup.append(inputYearOfEnding);
+  //   filter.append(inputGroup);
+
+  //   return filter;
+  // }
 
   // Этап 5. К форме добавления студента добавьте слушатель события отправки формы,
   // в котором будет проверка введенных данных.Если проверка пройдет успешно,
@@ -753,7 +926,7 @@
 
     let studentId = null;
 
-    form.addEventListener("submit", function (event) {
+    form.addEventListener("submit1", function (event) {
       let nameOut = inputName.value;
       let surNameOut = inputSurName.value;
       let lastNameOut = inputLastName.value;
@@ -850,47 +1023,48 @@
     }
   }
 
-  function ValidFieldYearsStudy(inputYearOfStudy, validYearOfStudy) {
-    let yearOfStudyOut = inputYearOfStudy.valueAsDate;
+  // function ValidFieldYearsStudy(inputYearOfStudy, validYearOfStudy) {
+  //   let yearOfStudyOut = inputYearOfStudy.valueAsDate;
 
-    if (yearOfStudyOut === null) {
-      validYearOfStudy.textContent = "Поле не может быть пустым!";
-      inputYearOfStudy.classList.add("is-invalid");
-      return false;
-    } else if (yearOfStudyOut !== null && yearOfStudyOut.getFullYear() < 2000) {
-      validYearOfStudy.textContent =
-        "Год начала обучения должен находится в диапазоне от 2000-го до текущего года!";
-      inputYearOfStudy.classList.add("is-invalid");
-      return false;
-    } else {
-      inputYearOfStudy.classList.remove("is-invalid");
-      inputYearOfStudy.classList.add("is-valid");
-      return true;
-    }
-  }
+  //   if (yearOfStudyOut === null) {
+  //     validYearOfStudy.textContent = "Поле не может быть пустым!";
+  //     inputYearOfStudy.classList.add("is-invalid");
+  //     return false;
+  //   } else if (yearOfStudyOut !== null && yearOfStudyOut.getFullYear() < 2000) {
+  //     validYearOfStudy.textContent =
+  //       "Год начала обучения должен находится в диапазоне от 2000-го до текущего года!";
+  //     inputYearOfStudy.classList.add("is-invalid");
+  //     return false;
+  //   } else {
+  //     inputYearOfStudy.classList.remove("is-invalid");
+  //     inputYearOfStudy.classList.add("is-valid");
+  //     return true;
+  //   }
+  // }
 
-  function ValidFildDateBirth(inputDateOfBirth, validDateOfBirth) {
-    let dateOfBirthOut = inputDateOfBirth.valueAsDate;
-    if (dateOfBirthOut === null) {
-      validDateOfBirth.textContent = "Поле не может быть пустым!";
-      inputDateOfBirth.classList.add("is-invalid");
-      return false;
-    } else if (
-      dateOfBirthOut !== null &&
-      dateOfBirthOut < new Date(1900, 01, 01)
-    ) {
-      validDateOfBirth.textContent =
-        "Дата рождения должна находится в диапазоне от 01.01.1900 до текущей даты!";
-      inputDateOfBirth.classList.add("is-invalid");
-      return false;
-    } else {
-      inputDateOfBirth.classList.remove("is-invalid");
-      inputDateOfBirth.classList.add("is-valid");
-      return true;
-    }
-  }
+  // function ValidFildDateBirth(inputDateOfBirth, validDateOfBirth) {
+  //   let dateOfBirthOut = inputDateOfBirth.valueAsDate;
+  //   if (dateOfBirthOut === null) {
+  //     validDateOfBirth.textContent = "Поле не может быть пустым!";
+  //     inputDateOfBirth.classList.add("is-invalid");
+  //     return false;
+  //   } else if (
+  //     dateOfBirthOut !== null &&
+  //     dateOfBirthOut < new Date(1900, 01, 01)
+  //   ) {
+  //     validDateOfBirth.textContent =
+  //       "Дата рождения должна находится в диапазоне от 01.01.1900 до текущей даты!";
+  //     inputDateOfBirth.classList.add("is-invalid");
+  //     return false;
+  //   } else {
+  //     inputDateOfBirth.classList.remove("is-invalid");
+  //     inputDateOfBirth.classList.add("is-valid");
+  //     return true;
+  //   }
+  // }
 
   // Этап 5. Создайте функцию сортировки массива студентов и добавьте события кликов на соответствующие колонки.
+
   function Sortingclients(arr, prop, dir = false) {
     return arr.sort((a, b) =>
       dir ? a[prop] < b[prop] : a[prop] > b[prop] ? 1 : -1
@@ -945,6 +1119,10 @@
   }
 
   // clientsList = await GetclientsFromServer();
-
+  const btnAddClient = document.querySelector(".clients__btn");
+  btnAddClient.addEventListener("click", () => {
+    const m = ModalWindows();
+    $("#my").modal("show");
+  });
   renderClientsTable(clientsList);
 })();

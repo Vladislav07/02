@@ -135,10 +135,13 @@ img {
 }
 
 .clients__btn {
+  margin-left: auto;
+  margin-right: auto;
+  flex-grow: 0;
   padding: 14px 26.5px;
   font-weight: 700;
-  font-size: 18px;
-  line-height: 21px;
+  font-size: 14px;
+  line-height: 19px;
   text-align: center;
   border: 1px solid #9873ff;
   border-radius: 0;
@@ -192,8 +195,7 @@ img {
   padding: 0;
 }
 
-.table__date{
-
+.table__date {
 }
 
 .table__time {
@@ -203,7 +205,7 @@ img {
 
 /* modal */
 
-.modal-body{
+.modal-body {
   padding: 1.875rem;
   width: 450px;
 }
@@ -232,7 +234,7 @@ img {
   margin-bottom: 14px;
 }
 
-.form__label{
+.form__label {
   font-size: 10px;
   font-weight: 400;
   line-height: 14px;
@@ -261,8 +263,14 @@ img {
   width: 50%;
 }
 
-.btn__custom{
+.btn__custom {
+  display: flex;
+  flex-wrap: nowrap;
   font-size: 14px;
   line-height: 19px;
   font-weight: 600;
+}
+
+.btn__icon {
+  width: 16px;
 }
