@@ -85,11 +85,15 @@
     const iconBtn = document.createElement("span");
     const modalBody = document.createElement("div");
     const form = document.createElement("form");
+    const modalFooter = document.createElement("div");
+    const inputName = document.createElement("input");
+    const inputSurName = document.createElement("input");
+    const inputLastName = document.createElement("input");
 
     modalElement.setAttribute("id", "my");
     modalElement.classList.add("modal", "fade");
     dialog.classList.add("modal-dialog");
-    modalContent.classList.add("modal-content", "modal-body", "p-0");
+    modalContent.classList.add("modal-content");
     modalHeader.classList.add("modal-header", "modal__header");
     modalTitle.classList.add("modal-title", "modal__title");
     clientIdNode.classList.add("modal__id");
@@ -99,40 +103,54 @@
     btnClose.classList.add("close");
     iconBtn.setAttribute("aria-hidden", "true");
     iconBtn.innerHTML = "&#215";
-    btnClose.append(iconBtn);
-
-    form.classList.add("needs-validation");
+    modalBody.classList.add("modal-body");
+    form.classList.add(
+      "needs-validation",
+      "modal__form",
+      "d-flex",
+      "flex-column",
+      "align-items-center",
+      "p-0"
+    );
     form.setAttribute("novalidate", "true");
-    modalContent.classList.add("modal__form");
+
     modalHeader.append(modalTitle);
     modalHeader.append(clientIdNode);
     modalHeader.append(btnClose);
     modalContent.append(modalHeader);
-
     modalBody.append(form);
+    btnClose.append(iconBtn);
     modalContent.append(modalBody);
-    const modalFooter = document.createElement("div");
-    modalFooter.classList.add(
-      "modal-footer",
-      "d-flex",
-      "flex-column",
-      "justify-content-center"
-    );
+    inputName.setAttribute("required", "required");
+    inputSurName.setAttribute("required", "required");
+    const groupName = GetGroupInput(inputName, "name");
+    const groupSurName = GetGroupInput(inputSurName, "surname");
+    const groupLastName = GetGroupInput(inputLastName, "lastName");
+    groupName.append(AddValidField("Поле не может быть пустым!"));
+    groupSurName.append(AddValidField("Поле не может быть пустым!"));
+
+    inputName.addEventListener("blur", () => {
+      ValidFieldsNull(inputName);
+    });
+    inputSurName.addEventListener("blur", () => {
+      ValidFieldsNull(inputSurName);
+    });
+
+    form.append(groupName);
+    form.append(groupSurName);
+    form.append(groupLastName);
 
     if (client) {
       modalTitle.textContent = "Изменить данные";
       clientIdNode.textContent = "id: " + client.id;
-      form.append(GetInput("name", client.name));
-      form.append(GetInput("lastName", client.lastName));
-      form.append(GetInput("surname", client.surname));
+      inputName.value = client.name;
+      inputSurName.value = client.lastName;
+      inputLastName.value = client.surname;
       if (client.contacts) {
         displeyContacts(client.contacts, form);
       }
     } else {
       modalTitle.textContent = "Новый клиент";
-      form.append(GetInput("name"));
-      form.append(GetInput("lastName"));
-      form.append(GetInput("surname"));
     }
 
     const btnAddContact = GetButton(
@@ -140,10 +158,11 @@
       "./img/add_circle_outline.svg"
     );
 
-    form.append(btnAddContact);
     const btnSave = GetButton("Сохранить");
-    btnSave.setAttribute("type", "submit");
     const btnDeleteContact = GetButton("Удалить клиента");
+    btnSave.setAttribute("type", "submit");
+
+    form.append(btnAddContact);
     form.append(btnSave);
     form.append(btnDeleteContact);
     modalContent.append(modalFooter);
@@ -151,7 +170,8 @@
     modalElement.append(dialog);
 
     btnAddContact.addEventListener("click", () => {
-      form.append(GetInputContact());
+      const contact = GetInputContact();
+      btnAddContact.before(contact);
     });
 
     btnClose.addEventListener("click", () => {
@@ -159,9 +179,16 @@
     });
 
     form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      // let isValidName = ValidFieldsNull(inputName);
-      // let isValidSurName = ValidFieldsNull(inputSurName);
+      let isValidName = ValidFieldsNull(inputName);
+      let isValidSurName = ValidFieldsNull(inputSurName);
+
+      if (!ValidFieldsContacts() || !isValidName || !isValidSurName) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      form.classList.add("was-validated");
       const formData = SaveServerClient();
       if (client) {
         formData.id = client.id;
@@ -177,6 +204,91 @@
       const contact = Object.entries(c);
       tag.append(GetInputContact(c));
     });
+  }
+
+  function ValidFieldsContacts() {
+    const arrayClient = document.querySelectorAll("form > div > input");
+    arrayClient.forEach((field) => {
+      return ValidFieldContact(field);
+    });
+  }
+
+  function ValidFieldContact(field) {
+    let valid = true;
+    switch (field.getAttribute("name")) {
+      case "Vk":
+      case "Facebook":
+      case "Email":
+        if (!ValidFieldEmailAndUrl(field)) {
+          valid = false;
+        }
+        break;
+      case "Other":
+        if (!ValidFieldOther(field)) {
+          valid = false;
+        }
+        break;
+      case "Телефон":
+        if (!ValidFieldTel(field)) {
+          valid = false;
+        }
+        break;
+      default:
+        break;
+    }
+    return valid;
+  }
+
+  function ValidFieldEmailAndUrl(field) {
+    if (field.value === "") {
+      field.classList.add("is-invalid");
+      $(field).siblings("div").html("поле не может быть пустым");
+      return false;
+    } else if (field.validity.typeMismatch) {
+      if (field.getAttribute("name") === "Email") {
+        $(field).siblings("div").html("Введите корректный email");
+      } else {
+        $(field).siblings("div").html("Введите корректный URL");
+      }
+      field.classList.add("is-invalid");
+      return false;
+    } else {
+      field.classList.remove("is-invalid");
+      field.classList.add("is-valid");
+      return true;
+    }
+  }
+
+  function ValidFieldTel(field) {
+    if (field.value === "") {
+      field.classList.add("is-invalid");
+      $(field).siblings("div").html("поле не может быть пустым");
+      return false;
+    } else if (field.validity.patternMismatch) {
+      $(field).siblings("div").html("номер телефона должен состоять из 11 символов");
+      field.classList.add("is-invalid");
+      return false;
+    } else {
+      field.classList.remove("is-invalid");
+      field.classList.add("is-valid");
+      return true;
+    }
+  }
+
+  function ValidFieldOther(field) {
+    if (field.value === "") {
+      $(field).siblings("div").html("поле не может быть пустым");
+      field.classList.add("is-invalid");
+      return false;
+    } else if (field.validity.tooShort) {
+      $(field).siblings("div").html("поле не может быть меньше 20 символов");
+      field.classList.add("is-invalid");
+      return false;
+    } else {
+      field.classList.remove("is-invalid");
+      field.classList.add("is-valid");
+      return true;
+    }
   }
 
   async function GetClientsFromServer() {
@@ -270,55 +382,40 @@
     return btn;
   }
 
-  function GetInput(prop, value) {
+  function GetGroupInput(formInput, prop) {
     const formGroup = document.createElement("div");
-    formGroup.classList.add("form-group", "form__input--group");
     const formLabel = document.createElement("label");
+
+    formGroup.classList.add("form-group", "form__input--group");
     formLabel.classList.add("col-form-label", "form__label", "p-0");
-    const formInput = document.createElement("input");
+    formLabel.setAttribute("for", prop);
     formInput.setAttribute("id", prop);
     formInput.setAttribute("name", prop);
     formInput.setAttribute("type", "text");
-    formLabel.setAttribute("for", prop);
     formInput.classList.add("form-control", "form__input--text", "p-0");
+    formGroup.append(formLabel);
+    formGroup.append(formInput);
     switch (prop) {
       case "surname":
         formLabel.textContent = "Фамилия*";
-        const validSurName = document.createElement("div");
-        validSurName.classList.add("invalid-feedback");
-        validSurName.textContent = "Поле не может быть пустым!";
-        formGroup.append(validSurName);
-        formInput.setAttribute("required", "true");
-        formInput.addEventListener("blur", () => {
-          ValidFieldsNull(formInput);
-        });
         break;
       case "name":
         formLabel.textContent = "Имя*";
-        const validName = document.createElement("div");
-        validName.classList.add("invalid-feedback");
-        validName.textContent = "Поле не может быть пустым!";
-        formGroup.append(validName);
-        formInput.setAttribute("required", "true");
-        formInput.addEventListener("blur", () => {
-          ValidFieldsNull(formInput);
-        });
         break;
       case "lastName":
         formLabel.textContent = "Отчество";
         break;
-
       default:
         break;
     }
-
-    if (value) {
-      formInput.value = value;
-    }
-    formGroup.append(formLabel);
-    formGroup.append(formInput);
-
     return formGroup;
+  }
+
+  function AddValidField(message) {
+    const validField = document.createElement("div");
+    validField.classList.add("invalid-feedback");
+    validField.textContent = message;
+    return validField;
   }
 
   function ValidFieldsNull(field) {
@@ -396,18 +493,17 @@
 
   function GetInputContact(contact) {
     const typeContacts = ["Телефон", "Email", "Vk", "Facebook", "Другое"];
-
     const formGroup = document.createElement("div");
-    formGroup.classList.add("form-group");
-
     const formGroupAppend = document.createElement("div");
-    formGroupAppend.classList.add("form-group-append");
-
     const formselect = document.createElement("select");
+    const formInput = document.createElement("input");
+    //const wrapper = document.createElement("div");
+
+    formGroup.classList.add("form-group", "form__input--group");
+    formGroupAppend.classList.add("form-group-append");
     formselect.classList.add("custom-select");
     formselect.setAttribute("id", "select");
-
-    const formInput = document.createElement("input");
+    formInput.setAttribute("required", "required");
     formInput.setAttribute("placeholder", "Введите данные контакты");
     formInput.classList.add("form-control", "form-control__contact");
 
@@ -417,6 +513,7 @@
       option.text = el;
       formselect.append(option);
     });
+
     let selectedOptions = "";
 
     formselect.addEventListener("change", () => {
@@ -424,11 +521,14 @@
       addType(selectedOptions.text);
     });
 
+    let validField = null;
+
     function addType(prop) {
       switch (prop) {
         case "Телефон":
           formInput.setAttribute("type", "tel");
-          formInput.setAttribute("name", "tel");
+          formInput.setAttribute("name", "Телефон");
+          formInput.setAttribute("pattern", "[0-9]{11}");
           break;
         case "Email":
           formInput.setAttribute("type", "Email");
@@ -445,35 +545,49 @@
         case "Другое":
           formInput.setAttribute("type", "text");
           formInput.setAttribute("name", "Other");
+          formInput.setAttribute("minlength", "20");
           break;
         default:
           break;
       }
     }
+    formInput.setAttribute("required", "required");
+    validField = AddValidField("Поле не может быть пустым!");
 
     formGroup.append(formselect);
     formInput.setAttribute("aria-describedby", selectedOptions.text);
-    formGroup.append(formInput);
 
+    formInput.addEventListener("blur", () => {
+      if (ValidFieldContact(formInput)) {
+        AddButtonDeleteContact(formInput);
+      }
+    });
+
+    formGroup.append(formInput);
+    formGroup.append(validField);
     if (contact) {
       formselect.value = contact.type;
       addType(contact.type);
       formInput.value = contact.value;
-      AddButtonDeleteContact(formGroup);
+      AddButtonDeleteContact(formInput);
     }
 
     return formGroup;
   }
 
   function AddButtonDeleteContact(tag) {
-    const groupAppend = document.createElement("div");
-    groupAppend.classList.add("input-group-append");
-    const btn = document.createElement("button");
-    btn.classList.add("btn", "btn-outline-secondary");
-    btn.setAttribute("type", "button");
-    btn.innerHTML = "&#215";
-    groupAppend.append(btn);
-    tag.append(btn);
+    const next = $(tag).next();
+    if ($(next).is("div")) {
+      const groupAppend = document.createElement("div");
+      const btn = document.createElement("button");
+
+      groupAppend.classList.add("input-group-append");
+      btn.classList.add("btn", "btn-outline-secondary");
+      btn.setAttribute("type", "button");
+      btn.innerHTML = "&#215";
+      groupAppend.append(btn);
+      tag.after(btn);
+    }
   }
 
   function SaveServerClient(id) {
