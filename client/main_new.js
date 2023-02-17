@@ -1,4 +1,9 @@
 (async function () {
+  function createHeader() {
+    const table =document.createElement('table');
+    table.classList.add("table", "table-borderless")
+  }
+
   function createHeaderTable() {
     const btnAddClient = document.querySelector(".clients__btn");
     btnAddClient.addEventListener("click", () => {
@@ -26,15 +31,15 @@
 
   function createRowTable(clientObj) {
     const row = document.createElement("tr");
-    row.classList.add("table__row");
     const id = document.createElement("th");
-    id.classList.add("table__clientId");
     const fullName = getRangeTd();
     const actions = getRangeTd();
-
     const buttonGroup = document.createElement("div");
     const editButton = GetButton("Редактировать", "./img/edit.svg");
     const deleteButton = GetButton("Удалить", "./img/cancel.svg");
+
+    row.classList.add("table__row");  
+    id.classList.add("table__clientId");
     buttonGroup.classList.add("btn-group", "btn-group");
     buttonGroup.append(editButton);
     buttonGroup.append(deleteButton);
@@ -89,6 +94,7 @@
     const inputName = document.createElement("input");
     const inputSurName = document.createElement("input");
     const inputLastName = document.createElement("input");
+    let countContacts = 0;
 
     modalElement.setAttribute("id", "my");
     modalElement.classList.add("modal", "fade");
@@ -104,6 +110,7 @@
     iconBtn.setAttribute("aria-hidden", "true");
     iconBtn.innerHTML = "&#215";
     modalBody.classList.add("modal-body");
+
     form.classList.add(
       "needs-validation",
       "modal__form",
@@ -144,10 +151,10 @@
       modalTitle.textContent = "Изменить данные";
       clientIdNode.textContent = "id: " + client.id;
       inputName.value = client.name;
-      inputSurName.value = client.lastName;
-      inputLastName.value = client.surname;
+      inputSurName.value = client.surname;
+      inputLastName.value = client.lastName;
       if (client.contacts) {
-        displeyContacts(client.contacts, form);
+        countContacts = displeyContacts(client.contacts, form);
       }
     } else {
       modalTitle.textContent = "Новый клиент";
@@ -170,19 +177,31 @@
     modalElement.append(dialog);
 
     btnAddContact.addEventListener("click", () => {
+      countContacts +=1;
       const contact = GetInputContact();
       btnAddContact.before(contact);
+      if(countContacts >= 3) {
+        btnAddContact.style.display = "none";
+      }
     });
 
     btnClose.addEventListener("click", () => {
       onClose(modalElement);
     });
 
+    form.addEventListener("countContacts", ()=>{
+      countContacts -= 1;
+      if(countContacts < 3){
+        btnAddContact.style.display = 'flex' 
+      }
+
+    })
+
     form.addEventListener("submit", (e) => {
       let isValidName = ValidFieldsNull(inputName);
       let isValidSurName = ValidFieldsNull(inputSurName);
-
-      if (!ValidFieldsContacts() || !isValidName || !isValidSurName) {
+      let isValidContacts=ValidFieldsContacts();
+      if (!isValidContacts || !isValidName || !isValidSurName) {
         e.preventDefault();
         e.stopPropagation();
         return;
@@ -200,17 +219,25 @@
   }
 
   function displeyContacts(contacts, tag) {
+    let count = 0;
     contacts.forEach((c) => {
       const contact = Object.entries(c);
       tag.append(GetInputContact(c));
+      count += 1;
     });
+    return count;
   }
 
   function ValidFieldsContacts() {
+    let isStateValid = true;
     const arrayClient = document.querySelectorAll("form > div > input");
+    if(arrayClient.length <= 3)return true;
     arrayClient.forEach((field) => {
-      return ValidFieldContact(field);
+      if(!ValidFieldContact(field)){
+        isStateValid = false;
+      }
     });
+    return isStateValid;
   }
 
   function ValidFieldContact(field) {
@@ -466,11 +493,20 @@
   function GetContacts(array) {
     const contacts = document.createElement("td");
     const imgGroup = document.createElement("div");
+    
+
     imgGroup.classList.add("btn-group");
     array.forEach((element) => {
+      const btnContact = document.createElement("button");
+      btnContact.classList.add('btn', "p-0");
+      btnContact.setAttribute('type',"button");
+      btnContact.setAttribute('data-placement',"top");
+      btnContact.setAttribute('data-toggle',"tooltip");
       const img = document.createElement("img");
+      btnContact.setAttribute('title',element.type + ': ' + element.value);
       switch (element.type) {
         case "Facebook":
+         
           img.setAttribute("src", "./img/fb.svg");
           break;
         case "Телефон":
@@ -484,7 +520,8 @@
           break;
       }
       img.classList.add("clients__img");
-      imgGroup.append(img);
+      btnContact.append(img);
+      imgGroup.append(btnContact);
     });
 
     contacts.append(imgGroup);
@@ -497,7 +534,6 @@
     const formGroupAppend = document.createElement("div");
     const formselect = document.createElement("select");
     const formInput = document.createElement("input");
-    //const wrapper = document.createElement("div");
 
     formGroup.classList.add("form-group", "form__input--group");
     formGroupAppend.classList.add("form-group-append");
@@ -570,6 +606,9 @@
       addType(contact.type);
       formInput.value = contact.value;
       AddButtonDeleteContact(formInput);
+    } else {
+      selectedOptions = formselect.options[formselect.selectedIndex];
+      addType(selectedOptions.text);
     }
 
     return formGroup;
@@ -585,6 +624,12 @@
       btn.classList.add("btn", "btn-outline-secondary");
       btn.setAttribute("type", "button");
       btn.innerHTML = "&#215";
+      btn.addEventListener("click", ()=>{
+        const parent = $(tag).parent();
+        let event = new Event("countContacts", {bubbles: true});
+        tag.dispatchEvent(event);
+        parent.remove();
+      })
       groupAppend.append(btn);
       tag.after(btn);
     }
@@ -618,7 +663,7 @@
         case "Facebook":
           clientForm.contacts.push({ type: "Facebook", value: field.value });
           break;
-        case "'Телефон'":
+        case "Телефон":
           clientForm.contacts.push({ type: "Телефон", value: field.value });
           break;
 
@@ -628,6 +673,14 @@
     });
     return clientForm;
   }
+
+  function Sortingclients(arr, prop, dir = false) {
+    return arr.sort((a, b) =>
+      dir ? a[prop] < b[prop] : a[prop] > b[prop] ? 1 : -1
+    );
+  }
+
   createHeaderTable();
   createBodyTable();
 })();
+
