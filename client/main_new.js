@@ -1,11 +1,106 @@
 (async function () {
-  function createHeader() {
-    const table =document.createElement('table');
-    table.classList.add("table", "table-borderless")
+  function RenderApp() {
+    const body = document.querySelector("body");
+    body.append(createHeader());
+    body.append(createMainSection());
+    createBodyTable();
   }
 
-  function createHeaderTable() {
-    const btnAddClient = document.querySelector(".clients__btn");
+  function createHeader() {
+    const header = document.createElement("header");
+    const containerHeader = document.createElement("div");
+    const row = document.createElement("div");
+    const logo = document.createElement("a");
+    const headerLogo = document.createElement("div");
+    const logoTitle = document.createElement("span");
+    const groupSearsh = document.createElement("div");
+    const inputSearsh = document.createElement("input");
+
+    logoTitle.classList.add("header__logo--title");
+    logoTitle.textContent = "skb.";
+    headerLogo.classList.add("header__logo");
+    logo.classList.add("col-auto", "logo");
+    logo.setAttribute("href", "/#");
+    row.classList.add("row", "justify-items-start", "align-items-center");
+    containerHeader.classList.add("container", "header__container");
+    groupSearsh.classList.add("col-auto", "input-group", "header__group");
+    inputSearsh.classList.add("form-control", "header__input");
+    inputSearsh.setAttribute("type", "text");
+    inputSearsh.setAttribute("placeholder", "Введите запрос");
+    inputSearsh.setAttribute("aria-label", "поле ввода запроса");
+
+    headerLogo.append(logoTitle);
+    logo.append(headerLogo);
+    groupSearsh.append(inputSearsh);
+    row.append(logo);
+    row.append(groupSearsh);
+    containerHeader.append(row);
+    header.append(containerHeader);
+    return header;
+  }
+
+  function createMainSection() {
+    const main = document.createElement("main");
+    const Section = document.createElement("section");
+    const containerSection = document.createElement("div");
+    const titleSection = document.createElement("h1");
+
+    titleSection.classList.add("clients__title");
+    titleSection.textContent = "Клиенты";
+    containerSection.classList.add(
+      "container",
+      "clients__container",
+      "d-flex",
+      "flex-column",
+      "justify-items-center"
+    );
+    Section.classList.add("clients");
+    main.classList.add("main");
+
+    containerSection.append(titleSection);
+    containerSection.append(createTable());
+    containerSection.append(createBtnAddClient());
+    Section.append(containerSection);
+    main.append(Section);
+    return main;
+  }
+
+  function createTable() {
+    const table = document.createElement("table");
+    const tHead = document.createElement("thead");
+    const tr = document.createElement("tr");
+    const thId = createTh("ID");
+    thId.append(createImgHeader("идентификатор", "id"));
+    const thName = createTh("Фамилия Имя Отчество");
+    thName.append(
+      createImgHeader("фамилия, имя, отчество", "name", "./img/а-я.svg")
+    );
+    const thDateCreated = createTh("Дата и время создания");
+
+    thDateCreated.append(createImgHeader("Дата создания", "createdAt"));
+    const thDateUpdated = createTh("Последние изменения");
+    thDateUpdated.append(createImgHeader("Последнее изменение", "updatedAt"));
+
+    const thContacts = createTh("Контакты");
+    const thActions = createTh("Действия");
+    tr.append(thId);
+    tr.append(thName);
+    tr.append(thDateCreated);
+
+    tr.append(thDateUpdated);
+
+    tr.append(thContacts);
+    tr.append(thActions);
+    tHead.append(tr);
+    table.append(tHead);
+    return table;
+  }
+
+  function createBtnAddClient() {
+    const btnAddClient = document.createElement("button");
+    btnAddClient.setAttribute("type", "button");
+    btnAddClient.classList.add("btn", "btn-outline-secondary", "clients__btn");
+    btnAddClient.textContent = "Добавить клиента";
     btnAddClient.addEventListener("click", () => {
       const modal = createModalWithForm(null, { onSave, onClose });
       document.body.append(modal);
@@ -14,19 +109,81 @@
       });
       $("#my").modal("show");
     });
+    return btnAddClient;
+  }
+
+  function createImgHeader(alt, prop, url = "./img/arrow_downward.svg") {
+    let sortDirection = true;
+    const imgHeader = document.createElement("img");
+    imgHeader.classList.add("table__header--arrow", "btn-reset");
+    imgHeader.setAttribute("src", url);
+    imgHeader.setAttribute("alt", alt);
+    imgHeader.addEventListener("click", () => {
+      imgHeader.classList.toggle("table__sort--toggle");
+      imgHeader.dispatchEvent(
+        new CustomEvent("Sort", {
+          detail: { column: prop, dir: sortDirection },
+          bubbles: true,
+        })
+      );
+      sortDirection = !sortDirection;
+    });
+    return imgHeader;
+  }
+
+  function createTh(text) {
+    const th = document.createElement("th");
+    th.setAttribute("scope", "col");
+    th.classList.add("table__header");
+    th.textContent = text;
+    return th;
   }
 
   async function createBodyTable() {
     const listClients = await GetClientsFromServer();
+    const formatedData = FormatingData(listClients);
     const table = document.querySelector("thead");
     const tBody = document.createElement("tbody");
     tBody.classList.add("table__content");
-    if (listClients) {
-      for (const client of listClients) {
-        tBody.append(createRowTable(client));
+    renderRow(formatedData);
+    table.addEventListener("Sort", (e) => {
+      e.preventDefault();
+      const column = e.detail.column;
+      const direction = e.detail.dir;
+      const arraySorted = Sortingclients(formatedData, column, direction);
+      clearBody(tBody);
+      renderRow(arraySorted);
+    });
+
+    table.after(tBody);
+
+    function renderRow(list) {
+      if (list) {
+        for (const client of list) {
+          tBody.append(createRowTable(client));
+        }
       }
     }
-    table.after(tBody);
+  }
+
+  function clearBody(tBody) {
+    const count = tBody.children.length;
+    for (let index = count; index > 0; index--) {
+      tBody.children[index - 1].remove();
+    }
+  }
+
+  function FormatingData(arr) {
+    const newArr = arr.map((client) => {
+      return {
+        ...client,
+        numberId: parseInt(client.id),
+        fullName: GetFullName(client),
+        dateCreated: new Date(client.createdAt),
+        dateUpdated: new Date(client.updatedAt),
+      };
+    });
+    return newArr;
   }
 
   function createRowTable(clientObj) {
@@ -37,8 +194,10 @@
     const buttonGroup = document.createElement("div");
     const editButton = GetButton("Редактировать", "./img/edit.svg");
     const deleteButton = GetButton("Удалить", "./img/cancel.svg");
+    const dateCreated = getRangeTd();
+    const dateUpdated = getRangeTd();
 
-    row.classList.add("table__row");  
+    row.classList.add("table__row");
     id.classList.add("table__clientId");
     buttonGroup.classList.add("btn-group", "btn-group");
     buttonGroup.append(editButton);
@@ -46,15 +205,17 @@
     actions.append(buttonGroup);
 
     id.setAttribute("scope", "row");
-    id.textContent = clientObj.id;
+    id.textContent = clientObj.numberId;
     row.append(id);
-    fullName.textContent = GetFullName(clientObj);
+    fullName.textContent = clientObj.fullName;
     const contacts = GetContacts(clientObj.contacts);
     row.append(fullName);
-    row.append(GetDate(clientObj.createdAt));
-    row.append(GetTime(clientObj.createdAt));
-    row.append(GetDate(clientObj.updatedAt));
-    row.append(GetTime(clientObj.updatedAt));
+    dateCreated.append(GetDate(clientObj.dateCreated));
+    dateCreated.append(GetTime(clientObj.dateCreated));
+    dateUpdated.append(GetDate(clientObj.dateUpdated));
+    dateUpdated.append(GetTime(clientObj.dateUpdated));
+    row.append(dateCreated);
+    row.append(dateUpdated);
     row.append(contacts);
     row.append(actions);
 
@@ -177,10 +338,10 @@
     modalElement.append(dialog);
 
     btnAddContact.addEventListener("click", () => {
-      countContacts +=1;
+      countContacts += 1;
       const contact = GetInputContact();
       btnAddContact.before(contact);
-      if(countContacts >= 3) {
+      if (countContacts >= 3) {
         btnAddContact.style.display = "none";
       }
     });
@@ -189,18 +350,17 @@
       onClose(modalElement);
     });
 
-    form.addEventListener("countContacts", ()=>{
+    form.addEventListener("countContacts", () => {
       countContacts -= 1;
-      if(countContacts < 3){
-        btnAddContact.style.display = 'flex' 
+      if (countContacts < 3) {
+        btnAddContact.style.display = "flex";
       }
-
-    })
+    });
 
     form.addEventListener("submit", (e) => {
       let isValidName = ValidFieldsNull(inputName);
       let isValidSurName = ValidFieldsNull(inputSurName);
-      let isValidContacts=ValidFieldsContacts();
+      let isValidContacts = ValidFieldsContacts();
       if (!isValidContacts || !isValidName || !isValidSurName) {
         e.preventDefault();
         e.stopPropagation();
@@ -231,9 +391,9 @@
   function ValidFieldsContacts() {
     let isStateValid = true;
     const arrayClient = document.querySelectorAll("form > div > input");
-    if(arrayClient.length <= 3)return true;
+    if (arrayClient.length <= 3) return true;
     arrayClient.forEach((field) => {
-      if(!ValidFieldContact(field)){
+      if (!ValidFieldContact(field)) {
         isStateValid = false;
       }
     });
@@ -292,7 +452,9 @@
       $(field).siblings("div").html("поле не может быть пустым");
       return false;
     } else if (field.validity.patternMismatch) {
-      $(field).siblings("div").html("номер телефона должен состоять из 11 символов");
+      $(field)
+        .siblings("div")
+        .html("номер телефона должен состоять из 11 символов");
       field.classList.add("is-invalid");
       return false;
     } else {
@@ -466,14 +628,13 @@
     return fullName;
   }
 
-  function GetDate(date) {
-    const formatedDate = getRangeTd();
+  function GetDate(formatDate) {
+    const formatedDate = document.createElement("span");
     formatedDate.classList.add("table__date");
-    let formatDate = new Date(date);
     let result =
       formatDate.getDate() +
       "." +
-      formatDate.getMonth() +
+      (formatDate.getMonth() + 1) +
       "." +
       formatDate.getFullYear();
 
@@ -481,33 +642,33 @@
     return formatedDate;
   }
 
-  function GetTime(date) {
-    const formatedTime = getRangeTd();
-    let formatDate = new Date(date);
+  function GetTime(formatDate) {
+    const formatedTime = document.createElement("span");
     formatedTime.classList.add("table__time");
     formatedTime.textContent =
-      formatDate.getMinutes() + ":" + formatDate.getHours();
+      formatDate.getHours() + ":" + formatDate.getMinutes();
     return formatedTime;
   }
 
   function GetContacts(array) {
     const contacts = document.createElement("td");
     const imgGroup = document.createElement("div");
-    
 
     imgGroup.classList.add("btn-group");
     array.forEach((element) => {
       const btnContact = document.createElement("button");
-      btnContact.classList.add('btn', "p-0");
-      btnContact.setAttribute('type',"button");
-      btnContact.setAttribute('data-placement',"top");
-      btnContact.setAttribute('data-toggle',"tooltip");
+      btnContact.classList.add("btn", "p-0", "btn__tooltip");
+      btnContact.setAttribute("type", "button");
+      btnContact.setAttribute("data-placement", "top");
+      btnContact.setAttribute("data-toggle", "tooltip");
       const img = document.createElement("img");
-      btnContact.setAttribute('title',element.type + ': ' + element.value);
+      btnContact.setAttribute("title", element.type + ": " + element.value);
       switch (element.type) {
         case "Facebook":
-         
           img.setAttribute("src", "./img/fb.svg");
+          break;
+        case "Vk":
+          img.setAttribute("src", "./img/vk.svg");
           break;
         case "Телефон":
           img.setAttribute("src", "./img/phone.svg");
@@ -515,11 +676,22 @@
         case "Email":
           img.setAttribute("src", "./img/mail.svg");
           break;
+        case "Other":
+          img.setAttribute("src", "./img/Subtract.svg");
+          break;
 
         default:
           break;
       }
       img.classList.add("clients__img");
+      btnContact.addEventListener("mouseover", (e) => {
+        e.preventDefault();
+        $(btnContact).tooltip("show");
+      });
+      btnContact.addEventListener("mouseout", (e) => {
+        e.preventDefault();
+        $(btnContact).tooltip("hide");
+      });
       btnContact.append(img);
       imgGroup.append(btnContact);
     });
@@ -624,12 +796,12 @@
       btn.classList.add("btn", "btn-outline-secondary");
       btn.setAttribute("type", "button");
       btn.innerHTML = "&#215";
-      btn.addEventListener("click", ()=>{
+      btn.addEventListener("click", () => {
         const parent = $(tag).parent();
-        let event = new Event("countContacts", {bubbles: true});
+        let event = new Event("countContacts", { bubbles: true });
         tag.dispatchEvent(event);
         parent.remove();
-      })
+      });
       groupAppend.append(btn);
       tag.after(btn);
     }
@@ -680,7 +852,9 @@
     );
   }
 
-  createHeaderTable();
-  createBodyTable();
-})();
+  // function Sortingclients(arr, prop, dir = false) {
+  //   return arr.sort((a, b) => (a[prop] < b[prop] ? 1 : -1));
+  // }
 
+  RenderApp();
+})();

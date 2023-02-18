@@ -46,7 +46,6 @@ html {
 
 body {
   font-family: "OpenSans";
-
   color: var(--color-fonts);
   background-color: #fff;
 }
@@ -56,8 +55,19 @@ a {
   text-decoration: none;
 }
 
-img {
-  width: 100%;
+.btn-reset {
+  cursor: pointer;
+}
+
+.btn__tooltip {
+  border: none;
+  height: 16px;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.btn__tooltip:not(:last-child) {
+  margin-right: 6px;
 }
 
 .list-reset {
@@ -153,6 +163,7 @@ img {
 }
 
 .clients__img {
+  vertical-align: top;
   width: 16px;
   height: 16px;
 }
@@ -163,8 +174,11 @@ img {
   color: var(--color-fonts);
 }
 
+.table__sort--toggle{
+  transform: rotate(180deg);
+}
+
 .table__header--arrow {
-  width: 12px;
 }
 
 .table__content {
@@ -207,7 +221,7 @@ img {
 /* modal */
 
 .modal-body {
-  padding:0 1.875rem;
+  padding: 0 1.875rem;
 }
 
 .modal__header {
@@ -229,7 +243,6 @@ img {
 }
 
 .modal__form {
-
 }
 
 .form__input--group {
@@ -273,6 +286,7 @@ img {
   font-size: 14px;
   line-height: 19px;
   font-weight: 600;
+  padding: 0;
 }
 
 .btn__icon {
