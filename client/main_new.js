@@ -3,8 +3,18 @@
     const body = document.querySelector("body");
     body.append(createHeader());
     body.append(createMainSection());
-    createBodyTable();
+    LoadData();
   }
+
+  async function LoadData() {
+   
+ 
+ const listClients = await GetClientsFromServer();
+
+    
+    createBodyTable(listClients);
+  }
+
 
   function createHeader() {
     const header = document.createElement("header");
@@ -28,6 +38,14 @@
     inputSearsh.setAttribute("type", "text");
     inputSearsh.setAttribute("placeholder", "Введите запрос");
     inputSearsh.setAttribute("aria-label", "поле ввода запроса");
+
+    inputSearsh.addEventListener('change', () => {
+
+      const timerId = setTimeout(
+        displeyClientsSearsh(inputSearsh.value),
+        300)
+      clearTimeout(timerId);
+    })
 
     headerLogo.append(logoTitle);
     logo.append(headerLogo);
@@ -70,16 +88,16 @@
     const tHead = document.createElement("thead");
     const tr = document.createElement("tr");
     const thId = createTh("ID");
-    thId.append(createImgHeader("идентификатор", "id"));
+    thId.append(createImgHeader("идентификатор", "numberId"));
     const thName = createTh("Фамилия Имя Отчество");
     thName.append(
-      createImgHeader("фамилия, имя, отчество", "name", "./img/а-я.svg")
+      createImgHeader("фамилия, имя, отчество", "fullName", "./img/а-я.svg")
     );
     const thDateCreated = createTh("Дата и время создания");
 
-    thDateCreated.append(createImgHeader("Дата создания", "createdAt"));
+    thDateCreated.append(createImgHeader("Дата создания", "dateCreated"));
     const thDateUpdated = createTh("Последние изменения");
-    thDateUpdated.append(createImgHeader("Последнее изменение", "updatedAt"));
+    thDateUpdated.append(createImgHeader("Последнее изменение", "dateUpdated"));
 
     const thContacts = createTh("Контакты");
     const thActions = createTh("Действия");
@@ -119,6 +137,7 @@
     imgHeader.setAttribute("src", url);
     imgHeader.setAttribute("alt", alt);
     imgHeader.addEventListener("click", () => {
+      sortDirection = !sortDirection;
       imgHeader.classList.toggle("table__sort--toggle");
       imgHeader.dispatchEvent(
         new CustomEvent("Sort", {
@@ -126,7 +145,7 @@
           bubbles: true,
         })
       );
-      sortDirection = !sortDirection;
+
     });
     return imgHeader;
   }
@@ -139,15 +158,14 @@
     return th;
   }
 
-  async function createBodyTable() {
-    const listClients = await GetClientsFromServer();
+
+  function createBodyTable(listClients) {
     const formatedData = FormatingData(listClients);
     const table = document.querySelector("thead");
     const tBody = document.createElement("tbody");
     tBody.classList.add("table__content");
     renderRow(formatedData);
     table.addEventListener("Sort", (e) => {
-      e.preventDefault();
       const column = e.detail.column;
       const direction = e.detail.dir;
       const arraySorted = Sortingclients(formatedData, column, direction);
@@ -486,6 +504,16 @@
     return clients;
   }
 
+  async function GetClientsFromServerSearsh(query) {
+    const response = await fetch(`http://localhost:3000/api/clients?search=${query}`)
+    if (response.status == 200) {
+      const clients = await response.json();
+      return clients;
+    } else {
+      return null;
+    }
+  }
+
   async function AddClientToServer(client) {
     const res = await fetch("http://localhost:3000/api/clients", {
       method: "POST",
@@ -542,8 +570,9 @@
       if (!res.ok) {
         return;
       }
+      const listData = await res.json();
       modalElement.remove();
-      createBodyTable();
+      createBodyTable(listData);
     }
   }
 
@@ -847,14 +876,33 @@
   }
 
   function Sortingclients(arr, prop, dir = false) {
-    return arr.sort((a, b) =>
-      dir ? a[prop] < b[prop] : a[prop] > b[prop] ? 1 : -1
-    );
+    if (prop === 'fullName') {
+      return arr.sort((a, b) => {
+        let nameA = a[prop].toLowerCase();
+        let nameB = b[prop].toLowerCase();
+        if (dir) {
+          return (nameA < nameB ? -1 : 1);
+        }
+        else {
+          return (nameB < nameA ? -1 : 1);
+        }
+
+      })
+    } else {
+      return arr.sort((a, b) =>
+        dir ? a[prop] - b[prop] : b[prop] - a[prop]
+      );
+    }
   }
 
-  // function Sortingclients(arr, prop, dir = false) {
-  //   return arr.sort((a, b) => (a[prop] < b[prop] ? 1 : -1));
-  // }
+  async function displeyClientsSearsh(str) {
+    const arr = await GetClientsFromServerSearsh(str);
+    if (arr) {
+      const tBody = document.querySelector('tBody');
+      tBody.remove();
+      createBodyTable(arr);
+    }
+  };
 
   RenderApp();
 })();
