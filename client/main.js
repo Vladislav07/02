@@ -222,10 +222,7 @@
     const modalFooter = document.createElement("div");
     modalFooter.classList.add(
       "modal-footer",
-      "d-flex",
-      "flex-column",
-      "justify-content-center"
-    );
+
     let clientFromServer = null;
     if (clientId) {
       clientFromServer = await GetClientFromServerID(clientId);
@@ -1076,3 +1073,141 @@
   });
   renderClientsTable(clientList);
 })();
+
+function createModalWithForm(client, { onSave, onClose }) {
+    const modalElement = document.createElement("div");
+    const dialog = document.createElement("div");
+    const modalContent = document.createElement("div");
+    const modalHeader = document.createElement("div");
+    const modalTitle = document.createElement("h5");
+    const clientIdNode = document.createElement("div");
+    const btnClose = document.createElement("button");
+    const iconBtn = document.createElement("span");
+    const modalBody = document.createElement("div");
+    const form = document.createElement("form");
+    const modalFooter = document.createElement("div");
+    const inputName = document.createElement("input");
+    const inputSurName = document.createElement("input");
+    const inputLastName = document.createElement("input");
+    let countContacts = 0;
+
+    modalElement.setAttribute("id", "my");
+    modalElement.classList.add("modal", "fade");
+    dialog.classList.add("modal-dialog");
+    modalContent.classList.add("modal-content");
+    modalHeader.classList.add("modal-header", "modal__header");
+    modalTitle.classList.add("modal-title", "modal__title");
+    clientIdNode.classList.add("modal__id");
+    btnClose.setAttribute("type", "button");
+    btnClose.setAttribute("data-dismiss", "modal");
+    btnClose.setAttribute("aria-label", "Close");
+    btnClose.classList.add("close");
+    iconBtn.setAttribute("aria-hidden", "true");
+    iconBtn.innerHTML = "&#215";
+    modalBody.classList.add("modal-body");
+
+    form.classList.add(
+      "needs-validation",
+      "modal__form",
+      "d-flex",
+      "flex-column",
+      "align-items-center",
+      "p-0"
+    );
+    form.setAttribute("novalidate", "true");
+
+    modalHeader.append(modalTitle);
+    modalHeader.append(clientIdNode);
+    modalHeader.append(btnClose);
+    modalContent.append(modalHeader);
+    modalBody.append(form);
+    btnClose.append(iconBtn);
+    modalContent.append(modalBody);
+    inputName.setAttribute("required", "required");
+    inputSurName.setAttribute("required", "required");
+    const groupName = GetGroupInput(inputName, "name");
+    const groupSurName = GetGroupInput(inputSurName, "surname");
+    const groupLastName = GetGroupInput(inputLastName, "lastName");
+    groupName.append(AddValidField("Поле не может быть пустым!"));
+    groupSurName.append(AddValidField("Поле не может быть пустым!"));
+
+    inputName.addEventListener("blur", () => {
+      ValidFieldsNull(inputName);
+    });
+    inputSurName.addEventListener("blur", () => {
+      ValidFieldsNull(inputSurName);
+    });
+
+    form.append(groupName);
+    form.append(groupSurName);
+    form.append(groupLastName);
+
+    if (client) {
+      modalTitle.textContent = "Изменить данные";
+      clientIdNode.textContent = "id: " + client.id;
+      inputName.value = client.name;
+      inputSurName.value = client.surname;
+      inputLastName.value = client.lastName;
+      if (client.contacts) {
+        countContacts = displeyContacts(client.contacts, form);
+      }
+    } else {
+      modalTitle.textContent = "Новый клиент";
+    }
+
+    const btnAddContact = GetButton(
+      "Добавить контакт",
+      "./img/add_circle_outline.svg"
+    );
+
+    const btnSave = GetButton("Сохранить");
+    const btnDeleteContact = GetButton("Удалить клиента");
+    btnSave.setAttribute("type", "submit");
+
+    form.append(btnAddContact);
+    form.append(btnSave);
+    form.append(btnDeleteContact);
+    modalContent.append(modalFooter);
+    dialog.append(modalContent);
+    modalElement.append(dialog);
+
+    btnAddContact.addEventListener("click", () => {
+      countContacts += 1;
+      const contact = GetInputContact();
+      btnAddContact.before(contact);
+      if (countContacts >= 3) {
+        btnAddContact.style.display = "none";
+      }
+    });
+
+    btnClose.addEventListener("click", () => {
+      onClose(modalElement);
+    });
+
+    form.addEventListener("countContacts", () => {
+      countContacts -= 1;
+      if (countContacts < 3) {
+        btnAddContact.style.display = "flex";
+      }
+    });
+
+    form.addEventListener("submit", (e) => {
+      let isValidName = ValidFieldsNull(inputName);
+      let isValidSurName = ValidFieldsNull(inputSurName);
+      let isValidContacts = ValidFieldsContacts();
+      if (!isValidContacts || !isValidName || !isValidSurName) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      form.classList.add("was-validated");
+      const formData = SaveServerClient();
+      if (client) {
+        formData.id = client.id;
+      }
+      onSave(formData, modalElement);
+    });
+
+    return modalElement;
+  }

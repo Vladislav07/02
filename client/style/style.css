@@ -168,13 +168,34 @@ a {
   height: 16px;
 }
 
+.table__clients {
+  margin-bottom: 40px;
+}
+
 .table__header {
   font-size: 12px;
   line-height: 16px;
   color: var(--color-fonts);
 }
 
-.table__sort--toggle{
+.table__header--date {
+  width: 12%;
+}
+
+.table__spinner--wrapper {
+  padding-top: 132px;
+  padding-bottom: 132px;
+  background-color: #fff;
+  margin-bottom: 40px;
+}
+
+.table__spinner {
+  width: 36px;
+  height: 36px;
+  color: #9873ff;
+}
+
+.table__sort--toggle {
   transform: rotate(180deg);
 }
 
@@ -187,6 +208,10 @@ a {
 
 .table__row {
   border-bottom: 1px solid var(--color-fonts);
+}
+
+.table__range:not(:last-child) {
+  margin-right: 10px;
 }
 
 .table__clientId {
@@ -242,6 +267,18 @@ a {
   color: #b0b0b0;
 }
 
+.modal__content--delete {
+  width: 275px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.modal__btn--delete {
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 0;
+}
+
 .modal__form {
 }
 
@@ -280,13 +317,28 @@ a {
   width: 50%;
 }
 
-.btn__custom {
+.table__btn {
   display: flex;
   flex-wrap: nowrap;
   font-size: 14px;
   line-height: 19px;
   font-weight: 600;
+  background-repeat: no-repeat;
+  background-position: left;
   padding: 0;
+  padding-left: 16px;
+}
+
+.table__btn:not(:last-child) {
+  margin-right: 30px;
+}
+
+.table__btn--edit {
+  background-image: url("/client/img/edit.svg");
+}
+
+.table__btn--delete {
+  background-image: url("/client/img/cancel.svg");
 }
 
 .btn__icon {

@@ -7,14 +7,32 @@
   }
 
   async function LoadData() {
-   
- 
- const listClients = await GetClientsFromServer();
-
-    
-    createBodyTable(listClients);
+    const listClients = await GetClientsFromServer();
+    setTimeout(() => {
+      createBodyTable(listClients);
+    }, 1000);
+    waitingDownload();
   }
 
+  function waitingDownload() {
+    const table = document.querySelector("table");
+    const wrapper = document.createElement("div");
+    const spinner = document.createElement("div");
+    wrapper.classList.add(
+      "d-flex",
+      "justify-content-center",
+      "table__spinner--wrapper"
+    );
+    spinner.classList.add("spinner-border", "table__spinner");
+    spinner.setAttribute("role", "status");
+    spinner.setAttribute("currentColor", "#9873FF");
+    wrapper.append(spinner);
+    table.after(wrapper);
+
+    table.addEventListener("loaded", () => {
+      wrapper.remove();
+    });
+  }
 
   function createHeader() {
     const header = document.createElement("header");
@@ -39,13 +57,10 @@
     inputSearsh.setAttribute("placeholder", "Введите запрос");
     inputSearsh.setAttribute("aria-label", "поле ввода запроса");
 
-    inputSearsh.addEventListener('change', () => {
-
-      const timerId = setTimeout(
-        displeyClientsSearsh(inputSearsh.value),
-        300)
+    inputSearsh.addEventListener("change", () => {
+      const timerId = setTimeout(displeyClientsSearsh(inputSearsh.value), 300);
       clearTimeout(timerId);
-    })
+    });
 
     headerLogo.append(logoTitle);
     logo.append(headerLogo);
@@ -88,16 +103,19 @@
     const tHead = document.createElement("thead");
     const tr = document.createElement("tr");
     const thId = createTh("ID");
+    table.classList.add("table__clients");
     thId.append(createImgHeader("идентификатор", "numberId"));
     const thName = createTh("Фамилия Имя Отчество");
     thName.append(
       createImgHeader("фамилия, имя, отчество", "fullName", "./img/а-я.svg")
     );
     const thDateCreated = createTh("Дата и время создания");
-
+    thDateCreated.classList.add("table__header--date");
     thDateCreated.append(createImgHeader("Дата создания", "dateCreated"));
+
     const thDateUpdated = createTh("Последние изменения");
     thDateUpdated.append(createImgHeader("Последнее изменение", "dateUpdated"));
+    thDateUpdated.classList.add("table__header--date");
 
     const thContacts = createTh("Контакты");
     const thActions = createTh("Действия");
@@ -145,7 +163,6 @@
           bubbles: true,
         })
       );
-
     });
     return imgHeader;
   }
@@ -158,12 +175,17 @@
     return th;
   }
 
-
   function createBodyTable(listClients) {
     const formatedData = FormatingData(listClients);
     const table = document.querySelector("thead");
     const tBody = document.createElement("tbody");
     tBody.classList.add("table__content");
+
+    const eventLoaded = new CustomEvent("loaded", {
+      bubbles: true,
+    });
+
+    table.dispatchEvent(eventLoaded);
     renderRow(formatedData);
     table.addEventListener("Sort", (e) => {
       const column = e.detail.column;
@@ -210,10 +232,13 @@
     const fullName = getRangeTd();
     const actions = getRangeTd();
     const buttonGroup = document.createElement("div");
-    const editButton = GetButton("Редактировать", "./img/edit.svg");
-    const deleteButton = GetButton("Удалить", "./img/cancel.svg");
+    const editButton = GetButton("Редактировать");
+    const deleteButton = GetButton("Удалить");
     const dateCreated = getRangeTd();
     const dateUpdated = getRangeTd();
+
+    editButton.classList.add("table__btn", "table__btn--edit");
+    deleteButton.classList.add("table__btn", "table__btn--delete");
 
     row.classList.add("table__row");
     id.classList.add("table__clientId");
@@ -238,56 +263,43 @@
     row.append(actions);
 
     editButton.addEventListener("click", () => {
-      const modal = createModalWithForm(clientObj, { onSave, onClose });
-      document.body.append(modal);
-
-      $("#my").on("hidden.bs.modal", () => {
-        onClose(modal);
-      });
-
-      $("#my").modal("show");
+      EditClient(clientObj.id);
     });
 
     deleteButton.addEventListener("click", function () {
-      if (confirm("Вы уверены?")) {
-        DeleteClientFromServer(clientObj.id);
-        row.remove();
-      }
+      DeleteClient(clientObj.id);
     });
 
     return row;
   }
 
-  function createModalWithForm(client, { onSave, onClose }) {
-    const modalElement = document.createElement("div");
-    const dialog = document.createElement("div");
-    const modalContent = document.createElement("div");
-    const modalHeader = document.createElement("div");
-    const modalTitle = document.createElement("h5");
-    const clientIdNode = document.createElement("div");
-    const btnClose = document.createElement("button");
-    const iconBtn = document.createElement("span");
+  function DeleteClient(clientId) {
+    const modal = createContentModalDelete("del", clientId);
+    document.body.append(modal);
+    $("#del").on("hidden.bs.modal", () => {
+      onClose(modal);
+    });
+    $("#del").modal("show");
+  }
+
+  async function EditClient(clientId) {
+    const client = await GetClientFromServerID(clientId);
+    const modal = createContentModalEdit("edit", client);
+    document.body.append(modal);
+    $("#edit").on("hidden.bs.modal", () => {
+      onClose(modal);
+    });
+    $("#edit").modal("show");
+  }
+
+  function createContentModalEdit(idModal, client) {
     const modalBody = document.createElement("div");
     const form = document.createElement("form");
-    const modalFooter = document.createElement("div");
     const inputName = document.createElement("input");
     const inputSurName = document.createElement("input");
     const inputLastName = document.createElement("input");
     let countContacts = 0;
 
-    modalElement.setAttribute("id", "my");
-    modalElement.classList.add("modal", "fade");
-    dialog.classList.add("modal-dialog");
-    modalContent.classList.add("modal-content");
-    modalHeader.classList.add("modal-header", "modal__header");
-    modalTitle.classList.add("modal-title", "modal__title");
-    clientIdNode.classList.add("modal__id");
-    btnClose.setAttribute("type", "button");
-    btnClose.setAttribute("data-dismiss", "modal");
-    btnClose.setAttribute("aria-label", "Close");
-    btnClose.classList.add("close");
-    iconBtn.setAttribute("aria-hidden", "true");
-    iconBtn.innerHTML = "&#215";
     modalBody.classList.add("modal-body");
 
     form.classList.add(
@@ -299,14 +311,7 @@
       "p-0"
     );
     form.setAttribute("novalidate", "true");
-
-    modalHeader.append(modalTitle);
-    modalHeader.append(clientIdNode);
-    modalHeader.append(btnClose);
-    modalContent.append(modalHeader);
     modalBody.append(form);
-    btnClose.append(iconBtn);
-    modalContent.append(modalBody);
     inputName.setAttribute("required", "required");
     inputSurName.setAttribute("required", "required");
     const groupName = GetGroupInput(inputName, "name");
@@ -314,7 +319,6 @@
     const groupLastName = GetGroupInput(inputLastName, "lastName");
     groupName.append(AddValidField("Поле не может быть пустым!"));
     groupSurName.append(AddValidField("Поле не может быть пустым!"));
-
     inputName.addEventListener("blur", () => {
       ValidFieldsNull(inputName);
     });
@@ -327,8 +331,6 @@
     form.append(groupLastName);
 
     if (client) {
-      modalTitle.textContent = "Изменить данные";
-      clientIdNode.textContent = "id: " + client.id;
       inputName.value = client.name;
       inputSurName.value = client.surname;
       inputLastName.value = client.lastName;
@@ -351,9 +353,6 @@
     form.append(btnAddContact);
     form.append(btnSave);
     form.append(btnDeleteContact);
-    modalContent.append(modalFooter);
-    dialog.append(modalContent);
-    modalElement.append(dialog);
 
     btnAddContact.addEventListener("click", () => {
       countContacts += 1;
@@ -362,10 +361,6 @@
       if (countContacts >= 3) {
         btnAddContact.style.display = "none";
       }
-    });
-
-    btnClose.addEventListener("click", () => {
-      onClose(modalElement);
     });
 
     form.addEventListener("countContacts", () => {
@@ -393,6 +388,108 @@
       onSave(formData, modalElement);
     });
 
+    const modalEdit = createBaseModalForm(
+      idModal,
+      "Изменить данные",
+      modalBody,
+      client.id
+    );
+
+    return modalEdit;
+  }
+
+  function createContentModalDelete(idModal, clientId) {
+    const modalBody = document.createElement("div");
+    modalBody.classList.add(
+      "modal-body",
+      "d-flex",
+      "flex-column",
+      "justify-content-center",
+      "modal__content--delete"
+    );
+    const message = document.createElement("p");
+    message.textContent = "Вы действительно хотите удалить данного клиента?";
+    const btnDelete = document.createElement("button");
+    btnDelete.setAttribute("type", "button");
+    btnDelete.classList.add("btn", "btn-primary", "modal__btn--delete");
+    btnDelete.textContent = "Удалить";
+
+    btnDelete.addEventListener("click", () => {
+      DeleteClientFromServer(clientId);
+      onClose(modalDelete);
+    });
+
+    modalBody.append(message);
+    modalBody.append(btnDelete);
+
+    const modalDelete = createBaseModalForm(
+      idModal,
+      "Удалить клиента",
+      modalBody
+    );
+    return modalDelete;
+  }
+
+  function createBaseModalForm(idModal, title, body, clientId) {
+    const modalElement = document.createElement("div");
+    const dialog = document.createElement("div");
+    const modalContent = document.createElement("div");
+    const modalHeader = document.createElement("div");
+    const modalTitle = document.createElement("h5");
+    const btnClose = document.createElement("button");
+    const iconBtn = document.createElement("span");
+    const modalFooter = document.createElement("div");
+    const btnCancel = document.createElement("button");
+    const clientIdNode = document.createElement("div");
+
+    modalElement.setAttribute("id", idModal);
+    modalElement.classList.add("modal", "fade");
+    dialog.classList.add("modal-dialog");
+    modalContent.classList.add("modal-content");
+    modalHeader.classList.add("modal-header", "modal__header");
+    modalTitle.classList.add("modal-title", "modal__title");
+    modalTitle.textContent = title;
+    modalFooter.classList.add(
+      "modal-footer",
+      "d-flex",
+      "flex-column",
+      "justify-content-center"
+    );
+    clientIdNode.classList.add("modal__id");
+
+    btnClose.setAttribute("type", "button");
+    btnClose.setAttribute("data-dismiss", "modal");
+    btnClose.setAttribute("aria-label", "Close");
+    btnClose.classList.add("close");
+    iconBtn.setAttribute("aria-hidden", "true");
+    iconBtn.innerHTML = "&#215";
+    btnCancel.setAttribute("type", "button");
+    btnCancel.textContent = "Отмена";
+
+    modalHeader.append(modalTitle);
+
+    if (clientId) {
+      modalHeader.append(clientIdNode);
+      clientIdNode.textContent = "id: " + clientId;
+    }
+    modalHeader.append(btnClose);
+    modalContent.append(modalHeader);
+    btnClose.append(iconBtn);
+    modalContent.append(body);
+    modalFooter.append(btnCancel);
+    modalContent.append(modalFooter);
+
+    btnClose.addEventListener("click", () => {
+      onClose(modalElement);
+    });
+
+    btnCancel.addEventListener("click", () => {
+      $(`#${idModal}`).modal("hide");
+      onClose(modalElement);
+    });
+
+    dialog.append(modalContent);
+    modalElement.append(dialog);
     return modalElement;
   }
 
@@ -505,7 +602,9 @@
   }
 
   async function GetClientsFromServerSearsh(query) {
-    const response = await fetch(`http://localhost:3000/api/clients?search=${query}`)
+    const response = await fetch(
+      `http://localhost:3000/api/clients?search=${query}`
+    );
     if (response.status == 200) {
       const clients = await response.json();
       return clients;
@@ -586,17 +685,11 @@
     return range;
   }
 
-  function GetButton(text, imgUrl) {
+  function GetButton(text) {
     const btn = document.createElement("button");
-    btn.classList.add("btn", "btn__custom");
+    btn.classList.add("btn");
     btn.setAttribute("type", "button");
     btn.textContent = text;
-    if (imgUrl) {
-      const img = document.createElement("img");
-      img.setAttribute("src", imgUrl);
-      img.classList.add("btn__icon");
-      btn.append(img);
-    }
     return btn;
   }
 
@@ -876,33 +969,29 @@
   }
 
   function Sortingclients(arr, prop, dir = false) {
-    if (prop === 'fullName') {
+    if (prop === "fullName") {
       return arr.sort((a, b) => {
         let nameA = a[prop].toLowerCase();
         let nameB = b[prop].toLowerCase();
         if (dir) {
-          return (nameA < nameB ? -1 : 1);
+          return nameA < nameB ? -1 : 1;
+        } else {
+          return nameB < nameA ? -1 : 1;
         }
-        else {
-          return (nameB < nameA ? -1 : 1);
-        }
-
-      })
+      });
     } else {
-      return arr.sort((a, b) =>
-        dir ? a[prop] - b[prop] : b[prop] - a[prop]
-      );
+      return arr.sort((a, b) => (dir ? a[prop] - b[prop] : b[prop] - a[prop]));
     }
   }
 
   async function displeyClientsSearsh(str) {
     const arr = await GetClientsFromServerSearsh(str);
     if (arr) {
-      const tBody = document.querySelector('tBody');
+      const tBody = document.querySelector("tBody");
       tBody.remove();
       createBodyTable(arr);
     }
-  };
+  }
 
   RenderApp();
 })();
