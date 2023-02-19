@@ -138,12 +138,13 @@
     btnAddClient.classList.add("btn", "btn-outline-secondary", "clients__btn");
     btnAddClient.textContent = "Добавить клиента";
     btnAddClient.addEventListener("click", () => {
-      const modal = createModalWithForm(null, { onSave, onClose });
-      document.body.append(modal);
-      $("#my").on("hidden.bs.modal", () => {
-        onClose(modal);
-      });
-      $("#my").modal("show");
+      //   const modal = createModalWithForm(null, { onSave, onClose });
+      //   document.body.append(modal);
+      //   $("#my").on("hidden.bs.modal", () => {
+      //     onClose(modal);
+      //   });
+      //   $("#my").modal("show");
+      AddClient();
     });
     return btnAddClient;
   }
@@ -284,7 +285,7 @@
 
   async function EditClient(clientId) {
     const client = await GetClientFromServerID(clientId);
-    const modal = createContentModalEdit("edit", client);
+    const modal = createContentModal("edit", client);
     document.body.append(modal);
     $("#edit").on("hidden.bs.modal", () => {
       onClose(modal);
@@ -292,7 +293,16 @@
     $("#edit").modal("show");
   }
 
-  function createContentModalEdit(idModal, client) {
+  function AddClient() {
+    const modal = createContentModal("adding");
+    document.body.append(modal);
+    $("#adding").on("hidden.bs.modal", () => {
+      onClose(modal);
+    });
+    $("#adding").modal("show");
+  }
+
+  function createContentModal(idModal, client = null) {
     const modalBody = document.createElement("div");
     const form = document.createElement("form");
     const inputName = document.createElement("input");
@@ -337,8 +347,6 @@
       if (client.contacts) {
         countContacts = displeyContacts(client.contacts, form);
       }
-    } else {
-      modalTitle.textContent = "Новый клиент";
     }
 
     const btnAddContact = GetButton(
@@ -385,17 +393,22 @@
       if (client) {
         formData.id = client.id;
       }
-      onSave(formData, modalElement);
+      onSave(formData, modal);
     });
 
-    const modalEdit = createBaseModalForm(
-      idModal,
-      "Изменить данные",
-      modalBody,
-      client.id
-    );
+    let modal = null;
 
-    return modalEdit;
+    if (client) {
+      modal = createBaseModalForm(
+        idModal,
+        "Изменить данные",
+        modalBody,
+        client.id
+      );
+    } else {
+      modal = createBaseModalForm(idModal, "Новый клиент", modalBody);
+    }
+    return modal;
   }
 
   function createContentModalDelete(idModal, clientId) {
@@ -615,7 +628,7 @@
 
   async function AddClientToServer(client) {
     const res = await fetch("http://localhost:3000/api/clients", {
-      method: "POST",
+      method: "POST1",
       body: JSON.stringify(client),
       headers: {
         "Content-Type": "application/json",
@@ -625,7 +638,7 @@
   }
 
   async function EditingClientToServer(client) {
-    const res = await fetch(`http://localhost:3000/api/clients/${client.id}`, {
+    const res= await fetch(`http://localhost:3000/api/clients/${client.id}`, {
       method: "PATCH",
       body: JSON.stringify({
         name: client.name,
@@ -636,7 +649,7 @@
       headers: {
         "Content-Type": "application/json",
       },
-    });
+    })
     return res;
   }
 
@@ -658,21 +671,46 @@
     return client;
   }
 
-  async function onSave(formData, modalElement) {
-    if (formData.id) {
-      const res = await EditingClientToServer(formData);
-      if (!res.ok) {
-        return;
-      }
-    } else {
-      const res = await AddClientToServer(formData);
-      if (!res.ok) {
-        return;
-      }
-      const listData = await res.json();
-      modalElement.remove();
-      createBodyTable(listData);
+  async function errorProcessing(res) {
+    const message = "";
+    switch (res.status) {
+      case 404:
+        message =
+          "переданный в запросе метод не существует или запрашиваемый элемент не найден в базе данных";
+        break;
+      case 422:
+        const data = await res.json();
+        message = data.message;
+        break;
+      case 500:
+        message =
+          "странно, но сервер сломался :(<br>Обратитесь к куратору Skillbox, чтобы решить проблему";
+        break;
+      default:
+        message = "Что то пошло не так...";
+        break;
     }
+    alert(message);
+  }
+
+  async function onSave(formData, modalElement) {
+    let res = null;
+    if (formData.id) {
+      res = await EditingClientToServer(formData);
+      // if (!res.status === 200) {
+      errorProcessing(res);
+      return;
+      // }
+    } else {
+      res = await AddClientToServer(formData);
+      // if (!res.status === 201) {
+      errorProcessing(res);
+      return;
+      // }
+    }
+    const listData = await res.json();
+    modalElement.remove();
+    createBodyTable(listData);
   }
 
   function onClose(modalElement) {
