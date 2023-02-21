@@ -138,12 +138,6 @@
     btnAddClient.classList.add("btn", "btn-outline-secondary", "clients__btn");
     btnAddClient.textContent = "Добавить клиента";
     btnAddClient.addEventListener("click", () => {
-      //   const modal = createModalWithForm(null, { onSave, onClose });
-      //   document.body.append(modal);
-      //   $("#my").on("hidden.bs.modal", () => {
-      //     onClose(modal);
-      //   });
-      //   $("#my").modal("show");
       AddClient();
     });
     return btnAddClient;
@@ -354,13 +348,13 @@
       "./img/add_circle_outline.svg"
     );
 
-    const btnSave = GetButton("Сохранить");
-    const btnDeleteContact = GetButton("Удалить клиента");
-    btnSave.setAttribute("type", "submit");
+    btnAddContact.classList.add('modal__btn--addContact')
 
+    const btnSave = GetButton("Сохранить");
+    btnSave.classList.add("btn-primary");
+    btnSave.setAttribute("type", "submit");
     form.append(btnAddContact);
     form.append(btnSave);
-    form.append(btnDeleteContact);
 
     btnAddContact.addEventListener("click", () => {
       countContacts += 1;
@@ -475,26 +469,34 @@
     btnClose.setAttribute("aria-label", "Close");
     btnClose.classList.add("close");
     iconBtn.setAttribute("aria-hidden", "true");
+    iconBtn.classList.add("modal__icon--close");
     iconBtn.innerHTML = "&#215";
     btnCancel.setAttribute("type", "button");
-    btnCancel.textContent = "Отмена";
+
+    btnCancel.classList.add("btn", "modal__btn--cancel");
 
     modalHeader.append(modalTitle);
 
     if (clientId) {
       modalHeader.append(clientIdNode);
       clientIdNode.textContent = "id: " + clientId;
+      btnCancel.textContent = "Удалить клиента";
+      btnCancel.addEventListener("click", () => {
+        DeleteClient(clientId);
+      });
+    } else {
+      btnCancel.textContent = "Отмена";
+      btnClose.addEventListener("click", () => {
+        onClose(modalElement);
+      });
     }
+
     modalHeader.append(btnClose);
     modalContent.append(modalHeader);
     btnClose.append(iconBtn);
     modalContent.append(body);
     modalFooter.append(btnCancel);
     modalContent.append(modalFooter);
-
-    btnClose.addEventListener("click", () => {
-      onClose(modalElement);
-    });
 
     btnCancel.addEventListener("click", () => {
       $(`#${idModal}`).modal("hide");
@@ -609,78 +611,117 @@
   }
 
   async function GetClientsFromServer() {
-    const response = await fetch("http://localhost:3000/api/clients");
-    const clients = await response.json();
-    return clients;
+    try {
+      const res = await fetch("http://localhost:3000/api/clients");
+      if (res.status == 200) {
+        const clients = await res.json();
+        return clients;
+      } else {
+        throw new Error(await errorProcessing(res.status));
+      }
+    } catch (e) {
+      alert(e.message);
+    }
   }
 
   async function GetClientsFromServerSearsh(query) {
-    const response = await fetch(
-      `http://localhost:3000/api/clients?search=${query}`
-    );
-    if (response.status == 200) {
-      const clients = await response.json();
-      return clients;
-    } else {
-      return null;
+    try {
+      const res = await fetch(
+        `http://localhost:3000/api/clients?search=${query}`
+      );
+      if (res.status == 200) {
+        const clients = await response.json();
+        return clients;
+      } else {
+        throw new Error(await errorProcessing(res.status));
+      }
+    } catch (e) {
+      alert(e.message);
     }
   }
 
   async function AddClientToServer(client) {
-    const res = await fetch("http://localhost:3000/api/clients", {
-      method: "POST1",
-      body: JSON.stringify(client),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    return res;
+    try {
+      const res = await fetch("http://localhost:3000/api/clients", {
+        method: "POST1",
+        body: JSON.stringify(client),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (res === 201) {
+        return res;
+      } else {
+        throw new Error(await errorProcessing(res.status));
+      }
+    } catch (e) {
+      alert(e.message);
+    }
   }
 
   async function EditingClientToServer(client) {
-    const res= await fetch(`http://localhost:3000/api/clients/${client.id}`, {
-      method: "PATCH",
-      body: JSON.stringify({
-        name: client.name,
-        surname: client.surname,
-        lastName: client.lastName,
-        contacts: client.contacts,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-    return res;
+    try {
+      const res = await fetch(
+        `http://localhost:3000/api/clients/${client.id}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({
+            name: client.name,
+            surname: client.surname,
+            lastName: client.lastName,
+            contacts: client.contacts,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (res === 201) {
+        return res;
+      } else {
+        throw new Error(await errorProcessing(res.status));
+      }
+    } catch (e) {
+      alert(e.message);
+    }
   }
 
   async function DeleteClientFromServer(clientId) {
-    const res = await fetch(`http://localhost:3000/api/clients/${clientId}`, {
-      method: "DELETE",
-    });
-    return res;
+    try {
+      const res = await fetch(`http://localhost:3000/api/clients/${clientId}`, {
+        method: "DELETE",
+      });
+      if (res === 200) {
+        return res;
+      } else {
+        throw new Error(await errorProcessing(res.status));
+      }
+    } catch (error) {
+      alert(e.message);
+    }
   }
 
   async function GetClientFromServerID(clientId) {
-    const response = await fetch(
-      `http://localhost:3000/api/clients/${clientId}`,
-      {
-        method: "GET",
-      }
-    );
-    const client = await response.json();
+    const res = await fetch(`http://localhost:3000/api/clients/${clientId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const client = await res.json();
     return client;
   }
 
   async function errorProcessing(res) {
-    const message = "";
-    switch (res.status) {
+    let message = "";
+    switch (res) {
       case 404:
         message =
           "переданный в запросе метод не существует или запрашиваемый элемент не найден в базе данных";
         break;
       case 422:
         const data = await res.json();
-        message = data.message;
+        message = res;
         break;
       case 500:
         message =
@@ -690,7 +731,7 @@
         message = "Что то пошло не так...";
         break;
     }
-    alert(message);
+    return message;
   }
 
   async function onSave(formData, modalElement) {
