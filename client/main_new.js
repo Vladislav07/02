@@ -343,31 +343,33 @@
       }
     }
 
-    const btnAddContact = GetButton(
-      "Добавить контакт",
-      "./img/add_circle_outline.svg"
-    );
+    const groupContact = document.createElement("div");
+    groupContact.classList.add("form-group", "form__group--contact");
 
-    btnAddContact.classList.add('modal__btn--addContact')
+
+    const btnAddContact = GetButton("Добавить контакт");
+
+    btnAddContact.classList.add("modal__btn--addContact");
+    groupContact.append(btnAddContact);
 
     const btnSave = GetButton("Сохранить");
-    btnSave.classList.add("btn-primary");
+    btnSave.classList.add("btn-primary", "modal__btn--action");
     btnSave.setAttribute("type", "submit");
-    form.append(btnAddContact);
+    form.append(groupContact);
     form.append(btnSave);
 
     btnAddContact.addEventListener("click", () => {
       countContacts += 1;
       const contact = GetInputContact();
       btnAddContact.before(contact);
-      if (countContacts >= 3) {
+      if (countContacts >= 10) {
         btnAddContact.style.display = "none";
       }
     });
 
     form.addEventListener("countContacts", () => {
       countContacts -= 1;
-      if (countContacts < 3) {
+      if (countContacts < 10) {
         btnAddContact.style.display = "flex";
       }
     });
@@ -467,7 +469,7 @@
     btnClose.setAttribute("type", "button");
     btnClose.setAttribute("data-dismiss", "modal");
     btnClose.setAttribute("aria-label", "Close");
-    btnClose.classList.add("close");
+    btnClose.classList.add("close", "modal__btn--close");
     iconBtn.setAttribute("aria-hidden", "true");
     iconBtn.classList.add("modal__icon--close");
     iconBtn.innerHTML = "&#215";
@@ -908,7 +910,7 @@
     const formselect = document.createElement("select");
     const formInput = document.createElement("input");
 
-    formGroup.classList.add("form-group", "form__input--group");
+    formGroup.classList.add("form-group", "form__group--empty");
     formGroupAppend.classList.add("form-group-append");
     formselect.classList.add("custom-select");
     formselect.setAttribute("id", "select");
