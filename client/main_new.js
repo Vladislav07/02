@@ -417,6 +417,7 @@
       "modal__content--delete"
     );
     const message = document.createElement("p");
+    message.classList.add("modal__message");
     message.textContent = "Вы действительно хотите удалить данного клиента?";
     const btnDelete = document.createElement("button");
     btnDelete.setAttribute("type", "button");
@@ -456,6 +457,15 @@
     dialog.classList.add("modal-dialog");
     modalContent.classList.add("modal-content");
     modalHeader.classList.add("modal-header", "modal__header");
+
+    if (title==="Удалить клиента") {
+      modalHeader.classList.add("justify-content-center")
+
+    }
+    else{
+      modalHeader.classList.add("justify-content-start")
+    }
+
     modalTitle.classList.add("modal-title", "modal__title");
     modalTitle.textContent = title;
     modalFooter.classList.add(

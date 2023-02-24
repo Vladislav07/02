@@ -270,8 +270,6 @@ a {
   position: relative;
   border: 0;
   align-items: flex-end;
-  justify-content: flex-start;
-
 }
 
 .modal__title {
@@ -283,7 +281,6 @@ a {
 }
 
 .modal__id {
-
   font-size: 12px;
   line-height: 16px;
   font-weight: 400;
@@ -296,10 +293,20 @@ a {
   margin-right: auto;
 }
 
+.modal__message {
+  text-align: center;
+  padding: 0;
+  width: 100%;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 19px;
+  color: #333;
+}
+
 .close {
   position: absolute;
- right: 16px;
- top: 9px;
+  right: 16px;
+  top: 9px;
   font-size: 2.5rem;
   font-weight: 400;
 }
@@ -310,9 +317,9 @@ a {
   border-radius: 0;
 }
 
-.modal__btn--action{
-  padding:12px 35px ;
-  background-color: #9873FF;
+.modal__btn--action {
+  padding: 12px 35px;
+  background-color: #9873ff;
   font-size: 14px;
   line-height: 19px;
   font-weight: 600;
@@ -357,7 +364,6 @@ a {
   height: 100%;
   background-color: #c8c5d1;
   opacity: 0.3;
-
 }
 
 .modal-footer {
@@ -384,7 +390,6 @@ a {
   color: var(--color-fonts);
 }
 
-
 .form__input--text {
   height: 23px;
   border: 0;
@@ -408,7 +413,7 @@ a {
   width: 30%;
   height: 100%;
   z-index: 10;
-  background-color: #E7E5EB;
+  background-color: #e7e5eb;
   border: 1px solid #c8c5d1;
   border-radius: 0;
 }
@@ -433,10 +438,10 @@ a {
   width: 70%;
   z-index: 10;
   border-radius: 0;
-  background-color: #e7e5eb;;
+  background-color: #e7e5eb;
 }
 
-.form__group--empty{
+.form__group--empty {
   display: inline-flex;
   width: 100%;
   align-items: center;
