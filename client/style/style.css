@@ -176,6 +176,10 @@ a {
   margin-bottom: 40px;
 }
 
+.table__group--date {
+  display: flex;
+}
+
 .table__header {
   font-size: 12px;
   line-height: 16px;
@@ -184,6 +188,28 @@ a {
 
 .table__header--date {
   width: 12%;
+}
+
+.table__header--contacts {
+  width: 11%;
+}
+.table__range--contacts {
+  display: flex;
+  flex-wrap: wrap;
+  width: 108px;
+  justify-items: start;
+}
+
+.btn-group-vertical > .btn,
+.btn-group > .btn {
+  flex: none;
+}
+.btn__tooltip:nth-child(1),
+.btn__tooltip:nth-child(2),
+.btn__tooltip:nth-child(3),
+.btn__tooltip:nth-child(4),
+.btn__tooltip:nth-child(5) {
+  margin-bottom: 7px;
 }
 
 .table__spinner--wrapper {
@@ -211,6 +237,7 @@ a {
 }
 
 .table__row {
+  height: 60px;
   border-bottom: 1px solid var(--color-fonts);
 }
 
@@ -219,6 +246,7 @@ a {
 }
 
 .table__clientId {
+  padding: 10px;
   font-size: 12px;
   line-height: 16px;
   font-weight: 400;
@@ -237,6 +265,7 @@ a {
   font-weight: 400;
   color: #333;
   padding: 0;
+  margin-right: 15px;
 }
 
 .table__date {
@@ -262,8 +291,8 @@ a {
 
 .modal-header {
   padding-left: 1.875rem;
-  padding-top: 1.5rem;
-  padding-bottom: 0.5rem;
+  padding-top: 1.56rem;
+  padding-bottom: 0.625rem;
 }
 
 .modal__header {
@@ -294,27 +323,53 @@ a {
 }
 
 .modal__message {
+  margin-bottom: 25px;
   text-align: center;
   padding: 0;
-  width: 100%;
+  width: 275px;
   font-size: 14px;
   font-weight: 400;
   line-height: 19px;
   color: #333;
 }
 
+.modal-header .close {
+  padding: 0;
+  margin: 0;
+}
+
 .close {
+  font-size: 2.5rem;
+  font-weight: 400;
+}
+
+.modal__btn--close {
   position: absolute;
   right: 16px;
   top: 9px;
-  font-size: 2.5rem;
-  font-weight: 400;
+}
+
+.modal__icon--close {
+  width: 29px;
+  height: 29px;
 }
 
 .modal__btn--delete {
   margin-left: auto;
   margin-right: auto;
   border-radius: 0;
+  padding: 12px 35px;
+  background-color: #9873ff;
+  font-size: 14px;
+  line-height: 19px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.modal__contact--delete {
+  z-index: 10;
+  background-color: #c8c5d1;
+  opacity: 0.3;
 }
 
 .modal__btn--action {
@@ -326,7 +381,13 @@ a {
   color: #fff;
 }
 
+.modal-body {
+  margin-bottom: 11px;
+}
+
 .modal__btn--cancel {
+  padding: 0;
+  margin: 0;
   text-decoration: underline;
   font-size: 12px;
   line-height: 16px;
@@ -368,6 +429,8 @@ a {
 
 .modal-footer {
   border: 0;
+  padding: 0;
+  margin-bottom: 27px;
 }
 
 .form__group--contact {
@@ -441,6 +504,15 @@ a {
   background-color: #e7e5eb;
 }
 
+.form-control__mini {
+  position: relative;
+  display: inline-block;
+  width: 60%;
+  z-index: 10;
+  border-radius: 0;
+  background-color: #e7e5eb;
+}
+
 .form__group--empty {
   display: inline-flex;
   width: 100%;
@@ -457,10 +529,6 @@ a {
   background-position: left;
   padding: 0;
   padding-left: 16px;
-}
-
-.table__btn:not(:last-child) {
-  margin-right: 30px;
 }
 
 .table__btn--edit {

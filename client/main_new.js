@@ -77,7 +77,9 @@
     const Section = document.createElement("section");
     const containerSection = document.createElement("div");
     const titleSection = document.createElement("h1");
+    const tableResponsive = document.createElement("div");
 
+    tableResponsive.classList.add("table-responsive-md");
     titleSection.classList.add("clients__title");
     titleSection.textContent = "Клиенты";
     containerSection.classList.add(
@@ -91,7 +93,8 @@
     main.classList.add("main");
 
     containerSection.append(titleSection);
-    containerSection.append(createTable());
+    tableResponsive.append(createTable());
+    containerSection.append(tableResponsive);
     containerSection.append(createBtnAddClient());
     Section.append(containerSection);
     main.append(Section);
@@ -103,7 +106,7 @@
     const tHead = document.createElement("thead");
     const tr = document.createElement("tr");
     const thId = createTh("ID");
-    table.classList.add("table__clients");
+    table.classList.add("table", "table__clients", "table-borderless");
     thId.append(createImgHeader("идентификатор", "numberId"));
     const thName = createTh("Фамилия Имя Отчество");
     thName.append(
@@ -118,6 +121,7 @@
     thDateUpdated.classList.add("table__header--date");
 
     const thContacts = createTh("Контакты");
+    thContacts.classList.add("table__header--contacts");
     const thActions = createTh("Действия");
     tr.append(thId);
     tr.append(thName);
@@ -231,13 +235,17 @@
     const deleteButton = GetButton("Удалить");
     const dateCreated = getRangeTd();
     const dateUpdated = getRangeTd();
+    const dateGroupCreated = document.createElement("div");
+    const dateGroupUpdated = document.createElement("div");
 
     editButton.classList.add("table__btn", "table__btn--edit");
     deleteButton.classList.add("table__btn", "table__btn--delete");
+    dateGroupCreated.classList.add("table__group--date");
+    dateGroupUpdated.classList.add("table__group--date")
 
     row.classList.add("table__row");
     id.classList.add("table__clientId");
-    buttonGroup.classList.add("btn-group", "btn-group");
+    buttonGroup.classList.add("btn-group");
     buttonGroup.append(editButton);
     buttonGroup.append(deleteButton);
     actions.append(buttonGroup);
@@ -248,10 +256,12 @@
     fullName.textContent = clientObj.fullName;
     const contacts = GetContacts(clientObj.contacts);
     row.append(fullName);
-    dateCreated.append(GetDate(clientObj.dateCreated));
-    dateCreated.append(GetTime(clientObj.dateCreated));
-    dateUpdated.append(GetDate(clientObj.dateUpdated));
-    dateUpdated.append(GetTime(clientObj.dateUpdated));
+    dateGroupCreated.append(GetDate(clientObj.dateCreated));
+    dateGroupCreated.append(GetTime(clientObj.dateCreated));
+    dateCreated.append(dateGroupCreated);
+    dateGroupUpdated.append(GetDate(clientObj.dateUpdated));
+    dateGroupUpdated.append(GetTime(clientObj.dateUpdated));
+    dateUpdated.append(dateGroupUpdated)
     row.append(dateCreated);
     row.append(dateUpdated);
     row.append(contacts);
@@ -334,23 +344,22 @@
     form.append(groupSurName);
     form.append(groupLastName);
 
-    if (client) {
-      inputName.value = client.name;
-      inputSurName.value = client.surname;
-      inputLastName.value = client.lastName;
-      if (client.contacts) {
-        countContacts = displeyContacts(client.contacts, form);
-      }
-    }
-
     const groupContact = document.createElement("div");
     groupContact.classList.add("form-group", "form__group--contact");
-
 
     const btnAddContact = GetButton("Добавить контакт");
 
     btnAddContact.classList.add("modal__btn--addContact");
     groupContact.append(btnAddContact);
+
+    if (client) {
+      inputName.value = client.name;
+      inputSurName.value = client.surname;
+      inputLastName.value = client.lastName;
+      if (client.contacts) {
+        countContacts = displeyContacts(client.contacts, btnAddContact);
+      }
+    }
 
     const btnSave = GetButton("Сохранить");
     btnSave.classList.add("btn-primary", "modal__btn--action");
@@ -414,7 +423,8 @@
       "d-flex",
       "flex-column",
       "justify-content-center",
-      "modal__content--delete"
+      "modal__content--delete",
+      "p-0"
     );
     const message = document.createElement("p");
     message.classList.add("modal__message");
@@ -447,7 +457,7 @@
     const modalHeader = document.createElement("div");
     const modalTitle = document.createElement("h5");
     const btnClose = document.createElement("button");
-    const iconBtn = document.createElement("span");
+    const iconBtn = document.createElement("div");
     const modalFooter = document.createElement("div");
     const btnCancel = document.createElement("button");
     const clientIdNode = document.createElement("div");
@@ -458,12 +468,10 @@
     modalContent.classList.add("modal-content");
     modalHeader.classList.add("modal-header", "modal__header");
 
-    if (title==="Удалить клиента") {
-      modalHeader.classList.add("justify-content-center")
-
-    }
-    else{
-      modalHeader.classList.add("justify-content-start")
+    if (title === "Удалить клиента") {
+      modalHeader.classList.add("justify-content-center");
+    } else {
+      modalHeader.classList.add("justify-content-start");
     }
 
     modalTitle.classList.add("modal-title", "modal__title");
@@ -524,7 +532,7 @@
     let count = 0;
     contacts.forEach((c) => {
       const contact = Object.entries(c);
-      tag.append(GetInputContact(c));
+      tag.before(GetInputContact(c));
       count += 1;
     });
     return count;
@@ -532,8 +540,8 @@
 
   function ValidFieldsContacts() {
     let isStateValid = true;
-    const arrayClient = document.querySelectorAll("form > div > input");
-    if (arrayClient.length <= 3) return true;
+    const arrayClient = document.querySelectorAll("form > div > div > input");
+    // if (arrayClient.length <= 3) return true;
     arrayClient.forEach((field) => {
       if (!ValidFieldContact(field)) {
         isStateValid = false;
@@ -642,7 +650,7 @@
         `http://localhost:3000/api/clients?search=${query}`
       );
       if (res.status == 200) {
-        const clients = await response.json();
+        const clients = await res.json();
         return clients;
       } else {
         throw new Error(await errorProcessing(res.status));
@@ -655,13 +663,13 @@
   async function AddClientToServer(client) {
     try {
       const res = await fetch("http://localhost:3000/api/clients", {
-        method: "POST1",
+        method: "POST",
         body: JSON.stringify(client),
         headers: {
           "Content-Type": "application/json",
         },
       });
-      if (res === 201) {
+      if (res.status === 201) {
         return res;
       } else {
         throw new Error(await errorProcessing(res.status));
@@ -688,7 +696,7 @@
           },
         }
       );
-      if (res === 201) {
+      if (res.status === 200) {
         return res;
       } else {
         throw new Error(await errorProcessing(res.status));
@@ -703,7 +711,7 @@
       const res = await fetch(`http://localhost:3000/api/clients/${clientId}`, {
         method: "DELETE",
       });
-      if (res === 200) {
+      if (res.status === 200) {
         return res;
       } else {
         throw new Error(await errorProcessing(res.status));
@@ -750,16 +758,8 @@
     let res = null;
     if (formData.id) {
       res = await EditingClientToServer(formData);
-      // if (!res.status === 200) {
-      errorProcessing(res);
-      return;
-      // }
     } else {
       res = await AddClientToServer(formData);
-      // if (!res.status === 201) {
-      errorProcessing(res);
-      return;
-      // }
     }
     const listData = await res.json();
     modalElement.remove();
@@ -866,7 +866,7 @@
   function GetContacts(array) {
     const contacts = document.createElement("td");
     const imgGroup = document.createElement("div");
-
+    imgGroup.classList.add("table__range--contacts");
     imgGroup.classList.add("btn-group");
     array.forEach((element) => {
       const btnContact = document.createElement("button");
@@ -920,7 +920,7 @@
     const formselect = document.createElement("select");
     const formInput = document.createElement("input");
 
-    formGroup.classList.add("form-group", "form__group--empty");
+    formGroup.classList.add("form-group", "form__group--empty", "row");
     formGroupAppend.classList.add("form-group-append");
     formselect.classList.add("custom-select");
     formselect.setAttribute("id", "select");
@@ -980,6 +980,8 @@
 
     formInput.addEventListener("blur", () => {
       if (ValidFieldContact(formInput)) {
+        formInput.classList.remove("form-control__contact")
+        formInput.classList.add("form-control__mini")
         AddButtonDeleteContact(formInput);
       }
     });
@@ -987,11 +989,13 @@
     formGroup.append(formInput);
     formGroup.append(validField);
     if (contact) {
+      formInput.classList.add("form-control", "form-control__mini");
       formselect.value = contact.type;
       addType(contact.type);
       formInput.value = contact.value;
       AddButtonDeleteContact(formInput);
     } else {
+      formInput.classList.add("form-control", "form-control__contact");
       selectedOptions = formselect.options[formselect.selectedIndex];
       addType(selectedOptions.text);
     }
@@ -1006,7 +1010,7 @@
       const btn = document.createElement("button");
 
       groupAppend.classList.add("input-group-append");
-      btn.classList.add("btn", "btn-outline-secondary");
+      btn.classList.add("btn", "btn-outline-secondary", "modal__contact--delete");
       btn.setAttribute("type", "button");
       btn.innerHTML = "&#215";
       btn.addEventListener("click", () => {
@@ -1021,9 +1025,8 @@
   }
 
   function SaveServerClient(id) {
-    const arrayClient = document.querySelectorAll("form > div > input");
+    const arrayClient = document.querySelectorAll("form input");
     const clientForm = {};
-
     clientForm.contacts = [];
     arrayClient.forEach((field) => {
       switch (field.getAttribute("name")) {

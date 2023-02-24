@@ -1,258 +1,56 @@
 @media (max-width: 991.98px) {
   .header__container,
-  .hero__container,
-  .courses__container,
-  .about__container,
-  .teachers__container {
-    padding-left: 39px;
-    padding-right: 39px;
+  .clients__container {
+    max-width: 768px;
   }
 
-  .hero__container {
-    padding-top: 130px;
-    padding-bottom: 135px;
+  .table__group--action {
+    flex-direction: column;
   }
 
-  .hero__content {
-    max-width: 385px;
-  }
-
-  .hero__title {
-    margin-bottom: 17px;
-    font-size: 50px;
-    line-height: 50px;
-  }
-
-  .hero__img {
-    top: 117px;
-    right: 39px;
-  }
-
-  .about__content {
-    max-width: 449px;
-  }
-
-  .about__card img {
-    width: 110px;
-    height: 80px;
-    margin-bottom: 11px;
-  }
-
-  .about__card {
+  .table__group--date {
+    flex-wrap: wrap;
     align-items: flex-start;
+    justify-items: flex-start;
   }
 
-  .teachers__container {
-    padding-top: 72px;
-    padding-bottom: 57px;
+  .table__time,
+  .table__date {
+    padding: 0;
   }
 
-  .person {
-    max-width: 360px;
-  }
-
-  .person__img {
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-  }
-
-  .theme__content {
-    min-height: 376px;
-  }
-
-  .theme__btn {
-    padding: 20px 56px;
+  .btn-group,
+  .btn-group-vertical {
+    display: inline-block;
   }
 }
 
 @media (max-width: 767.98px) {
-  .header__container,
-  .hero__container,
-  .teachers__container,
-  .courses__container,
-  .about__container {
-    padding-left: 33px;
-    padding-right: 33px;
+  .header__group {
+    display: none;
   }
 
-  .hero__container {
-    padding-top: 78px;
-  }
-
-  .header__container .row {
-    justify-content: center;
+  .header__container{
+    padding: 8px 0;
   }
 
   .logo {
-    text-align: center;
-    margin-bottom: 30px;
+    margin-right: auto;
+    margin-left: auto;
   }
 
-  .hero__img {
-    display: none;
+  .header__logo {
+    width: 24px;
+    height: 24px;
   }
 
-  .about__container {
-    padding-bottom: 61px;
+  .header__logo--title {
+    font-size: 8px;
+    line-height: 12px;
   }
 
-  .about__content {
-    max-width: 345px;
-  }
-
-  .about__card img {
-    width: 110px;
-    height: 80px;
-  }
-
-  .about__say {
-    max-width: 180px;
-  }
-
-  .person {
-    max-width: 270px;
-  }
-
-  .theme__content {
-    min-height: 473px;
-  }
-
-  .theme__title {
-    line-height: 23px;
-  }
-
-  .theme__btn {
-    padding: 20px 49px;
-  }
-
-  .teachers__container { 
-    padding-bottom: 77px;
-}
-}
-
-
-@media (max-width: 425px) {
-  .header__container,
-  .hero__container,
-  .teachers__container,
-  .courses__container,
-  .about__container {
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-
-  .header__container {
-    padding-top: 32px;
-    padding-bottom: 25px;
-  }
-
-  .header__logo img {
-    width: 72px;
-  }
-
-  .nav {
-    display: none;
-  }
-
-  .logo {
-    margin-bottom: 0;
-  }
-
-  .burger {
-    display: block;
-    margin-right: 25px;
-  }
-
-  .about__card img {
-    width: 110px;
-    height: 80px;
-  }
-
-  .hero__container {
-    padding-top: 50px;
-    padding-bottom: 49px;
-  }
-
-  .hero__content {
-    max-width: 290px;
-  }
-
-  .hero__title {
-    margin-bottom: 4px;
-    font-size: 30px;
-    line-height: 30px;
-  }
-
-  .hero__descr {
-    margin-bottom: 45px;
-    font-size: 16px;
-    line-height: 21px;
-  }
-
-  .hero__btn {
-    padding: 21px 54px;
-    font-weight: 700;
-    font-size: 16px;
-    line-height: 19px;
-  }
-
-  .about__container {
-    padding-top: 52px;
-    padding-bottom: 48px;
-  }
-
-  .about__content {
-    max-width: 320px;
-  }
-
-  .about__img {
-    display: none;
-  }
-
-  .about__title,
-  .teachers__title,
-  .courses__title {
-    font-size: 20px;
-    line-height: 26px;
-  }
-
-  .about__say {
-    max-width: 210px;
-  }
-
-  .about__card img {
-    margin-bottom: 6px;
-  }
-
-  .teachers__container {
-    padding-top: 48px;
-    padding-bottom: 51px;
-  }
-
-  .person {
-    max-width: 320px;
-  }
-
-  .person__name {
-    line-height: 29px;
-  }
-
-  .teachers__title,
-  .courses__title {
-    font-size: 20px;
-    line-height: 20px;
-  }
-
-  .theme__title {
+  .clients__title{
     font-size: 18px;
-    line-height: 24px;
+    list-style: 24px;
   }
-
-  .courses__container {
-    padding-top: 50px;
-    padding-bottom: 19px;
-  }
-
-  .theme__btn {
-    padding: 22px 56px;
 }
