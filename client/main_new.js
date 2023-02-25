@@ -95,7 +95,15 @@
     containerSection.append(titleSection);
     tableResponsive.append(createTable());
     containerSection.append(tableResponsive);
-    containerSection.append(createBtnAddClient());
+    const mediaQuery = window.matchMedia("(min-width: 1200px)");
+    if (mediaQuery.matches) {
+      containerSection.addEventListener("loaded", () => {
+        containerSection.append(createBtnAddClient());
+      });
+    } else {
+      containerSection.append(createBtnAddClient());
+    }
+
     Section.append(containerSection);
     main.append(Section);
     return main;
@@ -108,7 +116,9 @@
     const thId = createTh("ID");
     table.classList.add("table", "table__clients", "table-borderless");
     thId.append(createImgHeader("идентификатор", "numberId"));
+    thId.classList.add("table__header--id");
     const thName = createTh("Фамилия Имя Отчество");
+    thName.classList.add("table__header--name");
     thName.append(
       createImgHeader("фамилия, имя, отчество", "fullName", "./img/а-я.svg")
     );
@@ -231,7 +241,7 @@
     const fullName = getRangeTd();
     const actions = getRangeTd();
     const buttonGroup = document.createElement("div");
-    const editButton = GetButton("Редактировать");
+    const editButton = GetButton("Изменить");
     const deleteButton = GetButton("Удалить");
     const dateCreated = getRangeTd();
     const dateUpdated = getRangeTd();
@@ -241,7 +251,7 @@
     editButton.classList.add("table__btn", "table__btn--edit");
     deleteButton.classList.add("table__btn", "table__btn--delete");
     dateGroupCreated.classList.add("table__group--date");
-    dateGroupUpdated.classList.add("table__group--date")
+    dateGroupUpdated.classList.add("table__group--date");
 
     row.classList.add("table__row");
     id.classList.add("table__clientId");
@@ -261,21 +271,55 @@
     dateCreated.append(dateGroupCreated);
     dateGroupUpdated.append(GetDate(clientObj.dateUpdated));
     dateGroupUpdated.append(GetTime(clientObj.dateUpdated));
-    dateUpdated.append(dateGroupUpdated)
+    dateUpdated.append(dateGroupUpdated);
     row.append(dateCreated);
     row.append(dateUpdated);
     row.append(contacts);
     row.append(actions);
 
     editButton.addEventListener("click", () => {
-      EditClient(clientObj.id);
+      const spiner = AddingSpinerToBtn("edit");
+      const timeout = setTimeout(() => {
+        EditClient(clientObj.id);
+        editButton.classList.remove("backgroundnNone");
+        spiner.remove();
+      }, 500);
+      editButton.classList.add("backgroundnNone");
+      editButton.append(spiner);
     });
 
     deleteButton.addEventListener("click", function () {
-      DeleteClient(clientObj.id);
+      const spiner = AddingSpinerToBtn("delete");
+      const timeout = setTimeout(() => {
+        DeleteClient(clientObj.id);
+        deleteButton.classList.remove("backgroundnNone");
+        spiner.remove();
+      }, 500);
+      deleteButton.classList.add("backgroundnNone");
+      deleteButton.append(spiner);
     });
 
     return row;
+  }
+
+  function AddingSpinerToBtn(btn) {
+    const spiner = document.createElement("span");
+    if (btn === "edit") {
+      spiner.classList.add(
+        "spinner-border",
+        "spinner-border-sm",
+        "spiner-edit"
+      );
+    } else if (btn === "delete") {
+      spiner.classList.add(
+        "spinner-border",
+        "spinner-border-sm",
+        "spiner-delete"
+      );
+    }
+    spiner.setAttribute("role", "status");
+    spiner.setAttribute("aria-hidden", "true");
+    return spiner;
   }
 
   function DeleteClient(clientId) {
@@ -980,8 +1024,8 @@
 
     formInput.addEventListener("blur", () => {
       if (ValidFieldContact(formInput)) {
-        formInput.classList.remove("form-control__contact")
-        formInput.classList.add("form-control__mini")
+        formInput.classList.remove("form-control__contact");
+        formInput.classList.add("form-control__mini");
         AddButtonDeleteContact(formInput);
       }
     });
@@ -1010,7 +1054,11 @@
       const btn = document.createElement("button");
 
       groupAppend.classList.add("input-group-append");
-      btn.classList.add("btn", "btn-outline-secondary", "modal__contact--delete");
+      btn.classList.add(
+        "btn",
+        "btn-outline-secondary",
+        "modal__contact--delete"
+      );
       btn.setAttribute("type", "button");
       btn.innerHTML = "&#215";
       btn.addEventListener("click", () => {

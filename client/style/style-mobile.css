@@ -1,7 +1,84 @@
+@media (max-width: 1199.98px) {
+  .header__container,
+  .clients__container {
+    max-width: 1024px;
+  }
+
+  .clients__container {
+    padding: 40px 20px;
+    padding-bottom: 100px;
+  }
+
+  .clients__title {
+    margin-bottom: 3px;
+  }
+
+  .table th.table__header--name {
+    width: 24%;
+  }
+
+  .table th.table__header--date {
+    width: 15.4%;
+  }
+
+  .table th.table__header--contacts {
+    width: 15.5%;
+  }
+  .table__spinner--wrapper {
+    padding-top: 129px;
+    padding-bottom: 129px;
+    width: 100%;
+  }
+
+  .table th {
+    padding-bottom: 5px;
+    padding-top: 5px;
+  }
+}
+
+.spinner-border {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
 @media (max-width: 991.98px) {
   .header__container,
   .clients__container {
     max-width: 768px;
+  }
+
+  .clients__container {
+    padding-bottom: 100px;
+  }
+
+  .table th.table__header--id {
+    padding-left: 20px;
+    width: 10%;
+  }
+
+  .table__clients {
+    margin-bottom: 37px;
+  }
+
+  .clients__title {
+    margin-bottom: 10px;
+  }
+
+  .table th.table__header--name {
+    min-width: 170px;
+  }
+
+  .table th.table__header--date {
+    min-width: 50px;
+  }
+
+  .table th.table__header--contacts {
+    width: 17.5%;
+  }
+
+  .table td {
+    padding-top: 5px;
+    padding-bottom: 5px;
   }
 
   .table__group--action {
@@ -26,11 +103,48 @@
 }
 
 @media (max-width: 767.98px) {
+  .table {
+    min-width: 728px;
+  }
+
+  .table td,
+  .table th {
+    padding: -0.5rem;
+  }
+
+  .table__spinner--wrapper {
+    padding-bottom: 154px;
+    width: 728px;
+  }
+
+  .spinner-border {
+    position: absolute;
+    left: 140px;
+  }
+
+  .table__group--action {
+    flex-direction: column;
+  }
+
+  .clients__container {
+    padding-top: 27px;
+    padding-bottom: 116px;
+    padding-left: 9px;
+    padding-right: 0;
+  }
+  .clients__title {
+    margin-bottom: 0px;
+  }
+
+  .table__clients {
+    margin-bottom: 20px;
+  }
+
   .header__group {
     display: none;
   }
 
-  .header__container{
+  .header__container {
     padding: 8px 0;
   }
 
@@ -49,7 +163,14 @@
     line-height: 12px;
   }
 
-  .clients__title{
+  .clients__container {
+    padding-top: 26px;
+    padding-bottom: 176px;
+    padding-left: 10px;
+    padding-right: 0;
+  }
+
+  .clients__title {
     font-size: 18px;
     list-style: 24px;
   }
