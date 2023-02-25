@@ -56,6 +56,8 @@ a {
 }
 
 .btn-reset {
+  padding: 0;
+  outline: none;
   cursor: pointer;
 }
 
@@ -168,11 +170,22 @@ a {
   background-position-x: 26.5px;
 }
 
-.clients__img {
+.table__contact--img {
   vertical-align: top;
   width: 16px;
   height: 16px;
+  opacity: 0.7;
 }
+
+.table__contact--img:focus{
+  opacity: 1;
+  box-shadow: none;
+}
+
+.table__contact--img:hover:not(:focus){
+  opacity: 1;
+}
+
 
 .table__clients {
   margin-bottom: 36px;
@@ -210,6 +223,7 @@ thead tr{
   font-weight: 400;
   color: var(--color-fonts);
 }
+
 
 .table__range--contacts {
   display: flex;
@@ -435,7 +449,7 @@ thead tr{
   color: #9873FF;
 }
 
-.table__header--arrow:hover + 
+.table__header--arrow:hover 
 
 .form__group--contact::before {
   content: "";

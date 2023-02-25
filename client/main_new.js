@@ -113,21 +113,32 @@
     const table = document.createElement("table");
     const tHead = document.createElement("thead");
     const tr = document.createElement("tr");
-    const thId = createTh("ID");
+    const thId = createThBtnSort("ID");
     table.classList.add("table", "table__clients", "table-borderless");
-    thId.append(createImgHeader("идентификатор", "numberId"));
+
+    addingDirectionSort(thId, createImgHeader("идентификатор", "numberId"));
     thId.classList.add("table__header--id");
-    const thName = createTh("Фамилия Имя Отчество");
+    const thName = createThBtnSort("Фамилия Имя Отчество");
     thName.classList.add("table__header--name");
-    thName.append(
+
+    addingDirectionSort(
+      thName,
       createImgHeader("фамилия, имя, отчество", "fullName", "./img/а-я.svg")
     );
-    const thDateCreated = createTh("Дата и время создания");
-    thDateCreated.classList.add("table__header--date");
-    thDateCreated.append(createImgHeader("Дата создания", "dateCreated"));
 
-    const thDateUpdated = createTh("Последние изменения");
-    thDateUpdated.append(createImgHeader("Последнее изменение", "dateUpdated"));
+    const thDateCreated = createThBtnSort("Дата и время создания");
+    thDateCreated.classList.add("table__header--date");
+
+    addingDirectionSort(
+      thDateCreated,
+      createImgHeader("Дата создания", "dateCreated")
+    );
+    const thDateUpdated = createThBtnSort("Последние изменения");
+
+    addingDirectionSort(
+      thDateUpdated,
+      createImgHeader("Последнее изменение", "dateUpdated")
+    );
     thDateUpdated.classList.add("table__header--date");
 
     const thContacts = createTh("Контакты");
@@ -144,6 +155,10 @@
     tHead.append(tr);
     table.append(tHead);
     return table;
+  }
+
+  function addingDirectionSort(header, node) {
+    header.children[0].append(node);
   }
 
   function createBtnAddClient() {
@@ -163,7 +178,12 @@
     imgHeader.classList.add("table__header--arrow", "btn-reset");
     imgHeader.setAttribute("src", url);
     imgHeader.setAttribute("alt", alt);
-    imgHeader.addEventListener("click", () => {
+    imgHeader.addEventListener("click", (e) => {
+      e.stopPropagation;
+      Sort();
+    });
+
+     function Sort() {
       sortDirection = !sortDirection;
       imgHeader.classList.toggle("table__sort--toggle");
       imgHeader.dispatchEvent(
@@ -172,8 +192,19 @@
           bubbles: true,
         })
       );
-    });
+    };
     return imgHeader;
+  }
+
+  function createThBtnSort(text) {
+    const th = document.createElement("th");
+    const btnHeader = document.createElement("button");
+    btnHeader.classList.add("btn", "btn-reset", "table__header", "shadow-none");
+    btnHeader.textContent = text;
+    th.setAttribute("scope", "col");
+    th.append(btnHeader);
+
+    return th;
   }
 
   function createTh(text) {
@@ -248,8 +279,12 @@
     const dateGroupCreated = document.createElement("div");
     const dateGroupUpdated = document.createElement("div");
 
-    editButton.classList.add("table__btn", "table__btn--edit");
-    deleteButton.classList.add("table__btn", "table__btn--delete");
+    editButton.classList.add("table__btn", "table__btn--edit", "shadow-none");
+    deleteButton.classList.add(
+      "table__btn",
+      "table__btn--delete",
+      "shadow-none"
+    );
     dateGroupCreated.classList.add("table__group--date");
     dateGroupUpdated.classList.add("table__group--date");
 
@@ -914,7 +949,7 @@
     imgGroup.classList.add("btn-group");
     array.forEach((element) => {
       const btnContact = document.createElement("button");
-      btnContact.classList.add("btn", "p-0", "btn__tooltip");
+      btnContact.classList.add("btn", "p-0", "btn__tooltip", "shadow-none");
       btnContact.setAttribute("type", "button");
       btnContact.setAttribute("data-placement", "top");
       btnContact.setAttribute("data-toggle", "tooltip");
@@ -940,7 +975,7 @@
         default:
           break;
       }
-      img.classList.add("clients__img");
+      img.classList.add("table__contact--img");
       btnContact.addEventListener("mouseover", (e) => {
         e.preventDefault();
         $(btnContact).tooltip("show");
