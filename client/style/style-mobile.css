@@ -1,5 +1,5 @@
 @media (max-width: 1199.98px) {
-  .header__container,
+  .header,
   .clients__container {
     max-width: 1024px;
   }
@@ -42,7 +42,7 @@
 }
 
 @media (max-width: 991.98px) {
-  .header__container,
+  .header,
   .clients__container {
     max-width: 768px;
   }
@@ -144,7 +144,7 @@
     display: none;
   }
 
-  .header__container {
+  .header {
     padding: 8px 0;
   }
 
@@ -158,7 +158,7 @@
     height: 24px;
   }
 
-  .header__logo--title {
+  .header__title {
     font-size: 8px;
     line-height: 12px;
   }

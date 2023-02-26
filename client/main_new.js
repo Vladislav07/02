@@ -44,13 +44,13 @@
     const groupSearsh = document.createElement("div");
     const inputSearsh = document.createElement("input");
 
-    logoTitle.classList.add("header__logo--title");
+    logoTitle.classList.add("header__title");
     logoTitle.textContent = "skb.";
     headerLogo.classList.add("header__logo");
     logo.classList.add("col-auto", "logo");
     logo.setAttribute("href", "/#");
     row.classList.add("row", "justify-items-start", "align-items-center");
-    containerHeader.classList.add("container", "header__container");
+    containerHeader.classList.add("container", "header");
     groupSearsh.classList.add("col-auto", "input-group", "header__group");
     inputSearsh.classList.add("form-control", "header__input");
     inputSearsh.setAttribute("type", "text");
@@ -113,32 +113,15 @@
     const table = document.createElement("table");
     const tHead = document.createElement("thead");
     const tr = document.createElement("tr");
-    const thId = createThBtnSort("ID");
+    const thId = createThBtnSort("ID", "numberId");
+    const thName = createThBtnSort("Фамилия Имя Отчество", "fullName");
+    const thDateCreated = createThBtnSort("Дата и время создания", "dateCreated");
+    const thDateUpdated = createThBtnSort("Последние изменения", "dateUpdated");
+
     table.classList.add("table", "table__clients", "table-borderless");
-
-    addingDirectionSort(thId, createImgHeader("идентификатор", "numberId"));
     thId.classList.add("table__header--id");
-    const thName = createThBtnSort("Фамилия Имя Отчество");
     thName.classList.add("table__header--name");
-
-    addingDirectionSort(
-      thName,
-      createImgHeader("фамилия, имя, отчество", "fullName", "./img/а-я.svg")
-    );
-
-    const thDateCreated = createThBtnSort("Дата и время создания");
     thDateCreated.classList.add("table__header--date");
-
-    addingDirectionSort(
-      thDateCreated,
-      createImgHeader("Дата создания", "dateCreated")
-    );
-    const thDateUpdated = createThBtnSort("Последние изменения");
-
-    addingDirectionSort(
-      thDateUpdated,
-      createImgHeader("Последнее изменение", "dateUpdated")
-    );
     thDateUpdated.classList.add("table__header--date");
 
     const thContacts = createTh("Контакты");
@@ -157,9 +140,6 @@
     return table;
   }
 
-  function addingDirectionSort(header, node) {
-    header.children[0].append(node);
-  }
 
   function createBtnAddClient() {
     const btnAddClient = document.createElement("button");
@@ -172,38 +152,52 @@
     return btnAddClient;
   }
 
-  function createImgHeader(alt, prop, url = "./img/arrow_downward.svg") {
+
+  function createThBtnSort(text, prop) {
     let sortDirection = true;
+    let textSortDireck = '';
+
+    const th = document.createElement("th");
+    const btnHeader = document.createElement("button");
+    btnHeader.classList.add("btn", "btn-reset", "table__header", "shadow-none");
+    btnHeader.textContent = text;
+    th.setAttribute("scope", "col");
     const imgHeader = document.createElement("img");
     imgHeader.classList.add("table__header--arrow", "btn-reset");
-    imgHeader.setAttribute("src", url);
-    imgHeader.setAttribute("alt", alt);
-    imgHeader.addEventListener("click", (e) => {
-      e.stopPropagation;
-      Sort();
-    });
+    imgHeader.setAttribute("src", "./img/arrow_downward.svg");
+    imgHeader.setAttribute("alt", text);
 
-     function Sort() {
+    btnHeader.append(imgHeader)
+    th.append(btnHeader)
+
+    let textSort = null;
+    if (prop === "fullName") {
+      textSort = document.createElement("span");
+      textSort.classList.add("table__sort--text");
+      textSort.textContent = textSortDireck;
+      btnHeader.append(textSort)
+    }
+
+    btnHeader.addEventListener('click', () => Sort())
+
+    function Sort() {
       sortDirection = !sortDirection;
       imgHeader.classList.toggle("table__sort--toggle");
-      imgHeader.dispatchEvent(
+      if (prop === "fullName") {
+        if (sortDirection) {
+          textSortDireck = "А-Я"
+        } else {
+          textSortDireck = "Я-А"
+        }
+        textSort.textContent = textSortDireck;
+      }
+      btnHeader.dispatchEvent(
         new CustomEvent("Sort", {
           detail: { column: prop, dir: sortDirection },
           bubbles: true,
         })
       );
     };
-    return imgHeader;
-  }
-
-  function createThBtnSort(text) {
-    const th = document.createElement("th");
-    const btnHeader = document.createElement("button");
-    btnHeader.classList.add("btn", "btn-reset", "table__header", "shadow-none");
-    btnHeader.textContent = text;
-    th.setAttribute("scope", "col");
-    th.append(btnHeader);
-
     return th;
   }
 
@@ -363,6 +357,10 @@
     $("#del").on("hidden.bs.modal", () => {
       onClose(modal);
     });
+    $("#del").on("show.bs.modal", () => {
+      modal.dispatchEvent(new CustomEvent("modal__show",{bubbles:true}))
+    });
+   
     $("#del").modal("show");
   }
 
@@ -373,6 +371,9 @@
     $("#edit").on("hidden.bs.modal", () => {
       onClose(modal);
     });
+    $("#edit").on("show.bs.modal", () => {
+      modal.dispatchEvent(new CustomEvent("modal__show",{bubbles:true}))
+    });
     $("#edit").modal("show");
   }
 
@@ -382,10 +383,15 @@
     $("#adding").on("hidden.bs.modal", () => {
       onClose(modal);
     });
+    $("#adding").on("show.bs.modal", () => {
+      modal.dispatchEvent(new CustomEvent("modal__show",{bubbles:true}))
+    });
     $("#adding").modal("show");
   }
 
   function createContentModal(idModal, client = null) {
+    let isDeleted = true;
+    let modal = null;
     const modalBody = document.createElement("div");
     const form = document.createElement("form");
     const inputName = document.createElement("input");
@@ -463,6 +469,8 @@
     });
 
     form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       let isValidName = ValidFieldsNull(inputName);
       let isValidSurName = ValidFieldsNull(inputSurName);
       let isValidContacts = ValidFieldsContacts();
@@ -477,10 +485,9 @@
       if (client) {
         formData.id = client.id;
       }
-      onSave(formData, modal);
-    });
 
-    let modal = null;
+      onSave(formData, modal,  displey);
+    });
 
     if (client) {
       modal = createBaseModalForm(
@@ -492,10 +499,20 @@
     } else {
       modal = createBaseModalForm(idModal, "Новый клиент", modalBody);
     }
+
+    function displey(message) {
+      const nodeMessage = document.createElement('p');
+      nodeMessage.classList.add('modal__message--error');
+      nodeMessage.textContent = message;
+      btnAddContact.before(nodeMessage);
+      isDeleted = false;
+    }
+
     return modal;
   }
 
   function createContentModalDelete(idModal, clientId) {
+    let isDeleted = true;
     const modalBody = document.createElement("div");
     modalBody.classList.add(
       "modal-body",
@@ -514,9 +531,22 @@
     btnDelete.textContent = "Удалить";
 
     btnDelete.addEventListener("click", () => {
-      DeleteClientFromServer(clientId);
-      onClose(modalDelete);
+      DeleteClientFromServer(clientId, displey);
+      setTimeout(() => {
+        if (isDeleted) {
+          onClose(modalDelete);
+        }
+      }, 500)
+
     });
+
+    function displey(message) {
+      const nodeMessage = document.createElement('p');
+      nodeMessage.classList.add('modal__message--error');
+      nodeMessage.textContent = message;
+      btnDelete.before(nodeMessage);
+      isDeleted = false;
+    }
 
     modalBody.append(message);
     modalBody.append(btnDelete);
@@ -601,6 +631,10 @@
       $(`#${idModal}`).modal("hide");
       onClose(modalElement);
     });
+
+  modalElement.addEventListener('modal__show', ()=>{
+    modalContent.classList.add("modal__show")
+  })
 
     dialog.append(modalContent);
     modalElement.append(dialog);
@@ -710,36 +744,26 @@
   }
 
   async function GetClientsFromServer() {
-    try {
-      const res = await fetch("http://localhost:3000/api/clients");
-      if (res.status == 200) {
-        const clients = await res.json();
-        return clients;
-      } else {
-        throw new Error(await errorProcessing(res.status));
-      }
-    } catch (e) {
-      alert(e.message);
+
+    const res = await fetch("http://localhost:3000/api/clients");
+    if (res.status == 200) {
+      const clients = await res.json();
+      return clients;
     }
   }
 
   async function GetClientsFromServerSearsh(query) {
-    try {
-      const res = await fetch(
-        `http://localhost:3000/api/clients?search=${query}`
-      );
-      if (res.status == 200) {
-        const clients = await res.json();
-        return clients;
-      } else {
-        throw new Error(await errorProcessing(res.status));
-      }
-    } catch (e) {
-      alert(e.message);
+    const res = await fetch(
+      `http://localhost:3000/api/clients?search=${query}`
+    );
+    if (res.status == 200) {
+      const clients = await res.json();
+      return clients;
     }
+
   }
 
-  async function AddClientToServer(client) {
+  async function AddClientToServer(client, cb) {
     try {
       const res = await fetch("http://localhost:3000/api/clients", {
         method: "POST",
@@ -748,17 +772,17 @@
           "Content-Type": "application/json",
         },
       });
-      if (res.status === 201) {
-        return res;
+      if (res.status !== 201) {
+        throw new Error(await errorProcessing(res))
       } else {
-        throw new Error(await errorProcessing(res.status));
+        return await res.json();
       }
-    } catch (e) {
-      alert(e.message);
+    } catch (error) {
+      cb(error.message)
     }
   }
 
-  async function EditingClientToServer(client) {
+  async function EditingClientToServer(client, cb) {
     try {
       const res = await fetch(
         `http://localhost:3000/api/clients/${client.id}`,
@@ -775,31 +799,35 @@
           },
         }
       );
-      if (res.status === 200) {
-        return res;
+
+      if (res.status !== 200) {
+        throw new Error(await errorProcessing(res))
       } else {
-        throw new Error(await errorProcessing(res.status));
+        return res;
       }
-    } catch (e) {
-      alert(e.message);
+    } catch (error) {
+      cb(error.message)
     }
+
   }
 
-  async function DeleteClientFromServer(clientId) {
+  async function DeleteClientFromServer(clientId, cb) {
     try {
       const res = await fetch(`http://localhost:3000/api/clients/${clientId}`, {
         method: "DELETE",
       });
-      if (res.status === 200) {
-        return res;
+      if (res.status !== 200) {
+        throw new Error(await errorProcessing(res))
       } else {
-        throw new Error(await errorProcessing(res.status));
+        return res;
       }
-    } catch (error) {
-      alert(e.message);
-    }
-  }
 
+    } catch (error) {
+      cb(error.message)
+    }
+
+
+  }
   async function GetClientFromServerID(clientId) {
     const res = await fetch(`http://localhost:3000/api/clients/${clientId}`, {
       method: "GET",
@@ -807,13 +835,15 @@
         "Content-Type": "application/json",
       },
     });
-    const client = await res.json();
-    return client;
+    if (res.status == 200) {
+      const client = await res.json();
+      return client;
+    }
   }
 
   async function errorProcessing(res) {
     let message = "";
-    switch (res) {
+    switch (res.status) {
       case 404:
         message =
           "переданный в запросе метод не существует или запрашиваемый элемент не найден в базе данных";
@@ -833,16 +863,19 @@
     return message;
   }
 
-  async function onSave(formData, modalElement) {
+
+
+  async function onSave(formData,modalElement, cb) {
     let res = null;
     if (formData.id) {
-      res = await EditingClientToServer(formData);
+      res = await EditingClientToServer(formData, cb);
     } else {
-      res = await AddClientToServer(formData);
+      res = await AddClientToServer(formData, cb);
     }
-    const listData = await res.json();
-    modalElement.remove();
-    createBodyTable(listData);
+    if (res !== null) {
+      modalElement.remove();
+      createBodyTable(res);
+    }
   }
 
   function onClose(modalElement) {

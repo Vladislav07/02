@@ -86,7 +86,7 @@ a {
   margin-bottom: 0;
 }
 
-.header__container {
+.header {
   max-width: 1366px;
   margin: 0 auto;
   padding: 20px;
@@ -125,7 +125,7 @@ a {
   color: #b0b0b0;
 }
 
-.header__logo--title {
+.header__title {
   display: inline-block;
   font-size: 18px;
   line-height: 25px;
@@ -264,6 +264,13 @@ thead tr{
   transform: rotate(180deg);
 }
 
+.table__sort--text{
+  font-size: 10px;
+  line-height: 100%;
+  font-weight: 400;
+  color: #9873FF;
+}
+
 .table__content {
   background-color: #fff;
 }
@@ -318,6 +325,15 @@ thead tr{
   padding: 0 1.875rem;
 }
 
+.modal-content {
+  opacity: 0.5;
+  transition: opacity ease-in-out 0.3s;
+}
+
+.modal__show{
+  opacity: 1;
+}
+
 .modal-header {
   padding-left: 1.875rem;
   padding-top: 1.56rem;
@@ -360,6 +376,15 @@ thead tr{
   font-weight: 400;
   line-height: 19px;
   color: #333;
+}
+
+.modal__message--error{
+  margin-bottom: 9px;
+  width: 255px;
+  font-size: 10px;
+  line-height: 13px;
+  font-weight: 400;
+  color: #F06A4D;
 }
 
 .modal-header .close {
