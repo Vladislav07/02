@@ -10,19 +10,20 @@
   }
 
   .clients__title {
-    margin-bottom: 3px;
+    margin-bottom: 7px;
   }
 
+
   .table th.table__header--name {
-    width: 24%;
+    width: 25%;
   }
 
   .table th.table__header--date {
-    width: 15.4%;
+    width: 14.5%;
   }
 
   .table th.table__header--contacts {
-    width: 15.5%;
+    width: 15%;
   }
   .table__spinner--wrapper {
     padding-top: 129px;
@@ -60,20 +61,16 @@
     margin-bottom: 37px;
   }
 
-  .clients__title {
-    margin-bottom: 10px;
-  }
-
   .table th.table__header--name {
-    min-width: 170px;
-  }
-
-  .table th.table__header--date {
-    min-width: 50px;
+    width: 27%;
   }
 
   .table th.table__header--contacts {
     width: 17.5%;
+  }
+
+  .table__btn--edit:not(:last-child) {
+    margin-right: 0;
   }
 
   .table td {
@@ -174,4 +171,25 @@
     font-size: 18px;
     list-style: 24px;
   }
+
+  .modal-dialog {
+    width: 300px;
+  }
+
+  .modal.fade .modal-dialog {
+    transform: translate(0, 141px);
+  }
+
+  .modal-body {
+    padding: 0px 1em;
+}
+.modal-header {
+  padding-left: 1rem;
+  padding-top: 1.5rem;
+  padding-bottom: 0.5rem;
+}
+.modal__btn--close {
+  right: 0px;
+  top: 0px;
+}
 }

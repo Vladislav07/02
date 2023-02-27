@@ -10,7 +10,7 @@
     const listClients = await GetClientsFromServer();
     setTimeout(() => {
       createBodyTable(listClients);
-    }, 1000);
+    }, 500);
     waitingDownload();
   }
 
@@ -48,7 +48,7 @@
     logoTitle.textContent = "skb.";
     headerLogo.classList.add("header__logo");
     logo.classList.add("col-auto", "logo");
-    logo.setAttribute("href", "/#");
+    logo.setAttribute("href", "#");
     row.classList.add("row", "justify-items-start", "align-items-center");
     containerHeader.classList.add("container", "header");
     groupSearsh.classList.add("col-auto", "input-group", "header__group");
@@ -57,7 +57,7 @@
     inputSearsh.setAttribute("placeholder", "Введите запрос");
     inputSearsh.setAttribute("aria-label", "поле ввода запроса");
 
-    inputSearsh.addEventListener("change", () => {
+    inputSearsh.addEventListener("input", () => {
       const timerId = setTimeout(displeyClientsSearsh(inputSearsh.value), 300);
       clearTimeout(timerId);
     });
@@ -127,6 +127,7 @@
     const thContacts = createTh("Контакты");
     thContacts.classList.add("table__header--contacts");
     const thActions = createTh("Действия");
+
     tr.append(thId);
     tr.append(thName);
     tr.append(thDateCreated);
@@ -155,7 +156,7 @@
 
   function createThBtnSort(text, prop) {
     let sortDirection = true;
-    let textSortDireck = '';
+    let textSortDireck = "А-Я";
 
     const th = document.createElement("th");
     const btnHeader = document.createElement("button");
@@ -274,11 +275,15 @@
     const dateGroupUpdated = document.createElement("div");
 
     editButton.classList.add("table__btn", "table__btn--edit", "shadow-none");
+    editButton.setAttribute('type',"button")
+    editButton.setAttribute('data-toggle',"modal")
+    editButton.setAttribute('href',"#edit")
     deleteButton.classList.add(
       "table__btn",
       "table__btn--delete",
       "shadow-none"
     );
+
     dateGroupCreated.classList.add("table__group--date");
     dateGroupUpdated.classList.add("table__group--date");
 
@@ -290,7 +295,7 @@
     actions.append(buttonGroup);
 
     id.setAttribute("scope", "row");
-    id.textContent = clientObj.numberId;
+    id.textContent = FormatIDText(clientObj.numberId);
     row.append(id);
     fullName.textContent = clientObj.fullName;
     const contacts = GetContacts(clientObj.contacts);
@@ -331,6 +336,10 @@
     return row;
   }
 
+  function FormatIDText(str) {
+    return str.toString().slice(7)
+  }
+
   function AddingSpinerToBtn(btn) {
     const spiner = document.createElement("span");
     if (btn === "edit") {
@@ -360,7 +369,7 @@
     $("#del").on("show.bs.modal", () => {
       modal.dispatchEvent(new CustomEvent("modal__show",{bubbles:true}))
     });
-   
+
     $("#del").modal("show");
   }
 
@@ -434,7 +443,7 @@
 
     const btnAddContact = GetButton("Добавить контакт");
 
-    btnAddContact.classList.add("modal__btn--addContact");
+    btnAddContact.classList.add("modal__btn--addContact", "shadow-none");
     groupContact.append(btnAddContact);
 
     if (client) {
@@ -527,7 +536,7 @@
     message.textContent = "Вы действительно хотите удалить данного клиента?";
     const btnDelete = document.createElement("button");
     btnDelete.setAttribute("type", "button");
-    btnDelete.classList.add("btn", "btn-primary", "modal__btn--delete");
+    btnDelete.classList.add("btn", "btn-primary", "modal__btn--delete","shadow-none");
     btnDelete.textContent = "Удалить";
 
     btnDelete.addEventListener("click", () => {
@@ -602,13 +611,13 @@
     iconBtn.innerHTML = "&#215";
     btnCancel.setAttribute("type", "button");
 
-    btnCancel.classList.add("btn", "modal__btn--cancel");
+    btnCancel.classList.add("btn", "modal__btn--cancel", "shadow-none");
 
     modalHeader.append(modalTitle);
 
     if (clientId) {
       modalHeader.append(clientIdNode);
-      clientIdNode.textContent = "id: " + clientId;
+      clientIdNode.textContent = "id: " + FormatIDText(clientId);
       btnCancel.textContent = "Удалить клиента";
       btnCancel.addEventListener("click", () => {
         DeleteClient(clientId);
@@ -633,7 +642,7 @@
     });
 
   modalElement.addEventListener('modal__show', ()=>{
-    modalContent.classList.add("modal__show")
+    modalElement.classList.add("modal__show")
   })
 
     dialog.append(modalContent);
@@ -1198,6 +1207,8 @@
     const arr = await GetClientsFromServerSearsh(str);
     if (arr) {
       const tBody = document.querySelector("tBody");
+      const btnAddClient = document.querySelector(".clients__btn")
+      btnAddClient.remove();
       tBody.remove();
       createBodyTable(arr);
     }

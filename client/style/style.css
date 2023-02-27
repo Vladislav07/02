@@ -138,13 +138,13 @@ a {
   position: relative;
   max-width: 1366px;
   margin: 0 auto;
-  padding: 40px 90px;
+  padding: 42px 90px;
   padding-bottom: 300px;
   background-color: #f5f5f5;
 }
 
 .clients__title {
-  margin-bottom: 17px;
+  margin-bottom: 13px;
   font-size: 24px;
   font-weight: 700;
   line-height: 32px;
@@ -170,6 +170,7 @@ a {
   background-position-x: 26.5px;
 }
 
+
 .table__contact--img {
   vertical-align: top;
   width: 16px;
@@ -177,43 +178,43 @@ a {
   opacity: 0.7;
 }
 
-.table__contact--img:focus{
+.table__contact--img:focus {
   opacity: 1;
   box-shadow: none;
 }
 
-.table__contact--img:hover:not(:focus){
+.table__contact--img:hover:not(:focus) {
   opacity: 1;
 }
-
 
 .table__clients {
   margin-bottom: 36px;
 }
 
-.table th.table__header--id{
+.table th.table__header--id {
   padding-left: 20px;
   width: 8%;
 }
 
-.table th.table__header--name{
-
-  width: 31%;
+.table th.table__header--name {
+  width: 32%;
 }
 
-.table th.table__header--date{
-  width: 14.5%;
+.table th.table__header--date {
+  width: 15%;
 }
 
-.table th.table__header--contacts{
-  width: 13.5%;
+.table th.table__header--contacts {
+  width: 12.5%;
 }
+
+
 
 .table__group--date {
   display: flex;
 }
 
-thead tr{
+thead tr {
   padding-left: 10px;
 }
 
@@ -223,7 +224,6 @@ thead tr{
   font-weight: 400;
   color: var(--color-fonts);
 }
-
 
 .table__range--contacts {
   display: flex;
@@ -264,11 +264,11 @@ thead tr{
   transform: rotate(180deg);
 }
 
-.table__sort--text{
+.table__sort--text {
   font-size: 10px;
   line-height: 100%;
   font-weight: 400;
-  color: #9873FF;
+  color: #9873ff;
 }
 
 .table__content {
@@ -285,7 +285,6 @@ thead tr{
 }
 
 .table__clientId {
-  padding: 10px;
   font-size: 12px;
   line-height: 16px;
   font-weight: 400;
@@ -295,7 +294,8 @@ thead tr{
 .table td,
 .table th {
   vertical-align: middle;
-  padding: 0.625rem;
+  padding: 0.4rem;
+
 }
 
 .table__range {
@@ -313,8 +313,10 @@ thead tr{
 }
 
 /* modal */
-.modal.show .modal-dialog {
-  transform: translateY(122px);
+
+.modal.fade .modal-dialog {
+  transition: transform 0.3s ease-out;
+  transform: translate(0, 122px);
 }
 
 .modal-dialog {
@@ -325,12 +327,12 @@ thead tr{
   padding: 0 1.875rem;
 }
 
-.modal-content {
-  opacity: 0.5;
-  transition: opacity ease-in-out 0.3s;
+.modal {
+  opacity: 0.3;
+  transition: opacity ease-in-out 0.8s;
 }
 
-.modal__show{
+.modal__show {
   opacity: 1;
 }
 
@@ -378,13 +380,13 @@ thead tr{
   color: #333;
 }
 
-.modal__message--error{
+.modal__message--error {
   margin-bottom: 9px;
   width: 255px;
   font-size: 10px;
   line-height: 13px;
   font-weight: 400;
-  color: #F06A4D;
+  color: #f06a4d;
 }
 
 .modal-header .close {
@@ -401,11 +403,19 @@ thead tr{
   position: absolute;
   right: 16px;
   top: 9px;
+  outline: none;
+  border: none;
+}
+
+.table__btn--edit:not(:last-child) {
+  margin-right: 29px;
 }
 
 .modal__icon--close {
   width: 29px;
   height: 29px;
+  outline: none;
+  border: none;
 }
 
 .modal__btn--delete {
@@ -470,13 +480,11 @@ thead tr{
   transition: color ease-in-out 0.3s;
 }
 
-.modal__btn--addContact:hover{
-  color: #9873FF;
+.modal__btn--addContact:hover {
+  color: #9873ff;
 }
 
-.table__header--arrow:hover 
-
-.form__group--contact::before {
+.table__header--arrow:hover .form__group--contact::before {
   content: "";
   position: absolute;
   right: 0;
@@ -598,57 +606,51 @@ thead tr{
   background-image: url("/client/img/edit.svg");
 }
 
-.table__btn--edit:hover:not(:focus) {
-  color: #9873FF;
+.table__btn--delete {
+  background-image: url("/client/img/cancel.svg");
+  background-repeat: no-repeat;
+}
 
+.table__btn--edit:hover:not(:focus) {
+  color: #9873ff;
 }
 .table__btn--edit:focus {
-  color: #9873FF;
+  color: #9873ff;
 }
 
 .table__btn--edit:active {
-  color: #9873FF;
-
+  color: #9873ff;
 }
 
-.btn .spinner-border{
+.btn .spinner-border {
   width: 1rem;
   height: 1rem;
   position: absolute;
   left: 0;
 }
 
-.spiner-edit{
-  color: #9873FF;
+.spiner-edit {
+  color: #9873ff;
 }
 
-.spiner-delete{
-  color: #F06A4D;
+.spiner-delete {
+  color: #f06a4d;
 }
 
-.backgroundnNone{
+.backgroundnNone {
   background: none;
 }
 
-
-.table__btn--delete {
-  background-image: url("/client/img/cancel.svg");
-  background-repeat: no-repeat;
-}
-
 .table__btn--delete:hover:not(:focus) {
-  color: #F06A4D;
-
-
+  color: #f06a4d;
 }
 .table__btn--delete:focus {
-  color: #F06A4D;
-
+  color: #f06a4d;
 }
 
 .table__btn--delete:active {
-  color: #F06A4D;
-  outline-color: #F06A4D;
+  color: #f06a4d;
+  outline-color: #f06a4d;
 }
 
 .btn__icon {
